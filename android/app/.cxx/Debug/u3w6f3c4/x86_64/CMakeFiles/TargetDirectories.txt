@@ -1,0 +1,2 @@
+C:/xampp/htdocs/jawda-app/jawda/android/app/.cxx/Debug/u3w6f3c4/x86_64/CMakeFiles/edit_cache.dir
+C:/xampp/htdocs/jawda-app/jawda/android/app/.cxx/Debug/u3w6f3c4/x86_64/CMakeFiles/rebuild_cache.dir
