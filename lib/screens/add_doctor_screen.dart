@@ -4,6 +4,8 @@ import '../providers/doctor_provider.dart';
 import '../models/doctor.dart';
 
 class AddDoctorScreen extends StatefulWidget {
+  const AddDoctorScreen({super.key});
+
   @override
   _AddDoctorScreenState createState() => _AddDoctorScreenState();
 }
@@ -36,7 +38,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Doctor'),
+        title: const Text('Add New Doctor'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -46,7 +48,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: const InputDecoration(labelText: 'Name'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the doctor\'s name.';
@@ -56,7 +58,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: 'Phone'),
+                decoration: const InputDecoration(labelText: 'Phone'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter the doctor\'s phone number.';
@@ -66,7 +68,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _cashPercentageController,
-                decoration: InputDecoration(labelText: 'Cash Percentage'),
+                decoration: const InputDecoration(labelText: 'Cash Percentage'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -80,7 +82,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _companyPercentageController,
-                decoration: InputDecoration(labelText: 'Company Percentage'),
+                decoration: const InputDecoration(labelText: 'Company Percentage'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -94,7 +96,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _staticWageController,
-                decoration: InputDecoration(labelText: 'Static Wage'),
+                decoration: const InputDecoration(labelText: 'Static Wage'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -108,7 +110,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _labPercentageController,
-                decoration: InputDecoration(labelText: 'Lab Percentage'),
+                decoration: const InputDecoration(labelText: 'Lab Percentage'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -122,7 +124,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _specialistIdController,
-                decoration: InputDecoration(labelText: 'Specialist ID'),
+                decoration: const InputDecoration(labelText: 'Specialist ID'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -136,7 +138,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
               ),
               TextFormField(
                 controller: _startController,
-                decoration: InputDecoration(labelText: 'Start'),
+                decoration: const InputDecoration(labelText: 'Start'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -148,7 +150,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
@@ -168,7 +170,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                     Navigator.pop(context); // Go back to the list screen
                   }
                 },
-                child: Text('Add Doctor'),
+                child: const Text('Add Doctor'),
               ),
             ],
           ),

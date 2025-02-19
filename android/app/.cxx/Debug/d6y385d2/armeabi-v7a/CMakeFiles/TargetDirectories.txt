@@ -1,0 +1,2 @@
+C:/Users/User/Desktop/jawda/jawda/android/app/.cxx/Debug/d6y385d2/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/jawda/jawda/android/app/.cxx/Debug/d6y385d2/armeabi-v7a/CMakeFiles/rebuild_cache.dir

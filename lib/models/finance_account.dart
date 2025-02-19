@@ -1,7 +1,6 @@
 class FinanceAccount {
   final int id;
   final String name;
-  final int accountCategoryId;
   final String debit;
   final String? description;
   final DateTime? createdAt;
@@ -18,7 +17,6 @@ class FinanceAccount {
   FinanceAccount({
     required this.id,
     required this.name,
-    required this.accountCategoryId,
     required this.debit,
     this.description,
     this.createdAt,
@@ -37,7 +35,6 @@ class FinanceAccount {
     return FinanceAccount(
       id: json['id'] as int,
       name: json['name'] as String,
-      accountCategoryId: json['account_category_id'] as int,
       debit: json['debit'] as String,
       description: json['description'] as String?,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
@@ -61,6 +58,7 @@ class Credit {
   final double amount;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final FinanceEntry? entry;
 
   Credit({
     required this.id,
@@ -69,6 +67,7 @@ class Credit {
     required this.amount,
     required this.createdAt,
     required this.updatedAt,
+    required this.entry,
   });
 
   factory Credit.fromJson(Map<String, dynamic> json) {
@@ -79,6 +78,8 @@ class Credit {
       amount: (json['amount'] as num).toDouble(),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      entry: json['entry']!=null ? FinanceEntry.fromJson(json['entry'] as Map<String, dynamic> ):null,
+
     );
   }
 }
@@ -89,6 +90,7 @@ class Debit {
   final double amount;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final FinanceEntry? entry;
 
   Debit({
     required this.id,
@@ -97,6 +99,7 @@ class Debit {
     required this.amount,
     required this.createdAt,
     required this.updatedAt,
+    required this.entry,
   });
 
   factory Debit.fromJson(Map<String, dynamic> json) {
@@ -107,6 +110,28 @@ class Debit {
       amount: (json['amount'] as num).toDouble(),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      entry: json['entry']!=null ? FinanceEntry.fromJson(json['entry'] as Map<String, dynamic> ):null,
+    );
+  }
+}
+
+class FinanceEntry {
+  DateTime createdAt;
+  DateTime updatedAt;
+  String description;
+  int id;
+  FinanceEntry({
+    required this.createdAt,
+    required this.updatedAt,
+    required this.description,
+    required this.id,
+  });
+  factory FinanceEntry.fromJson(Map<String, dynamic> json) {
+    return FinanceEntry(
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+      description: json['description'] as String,
+      id: json['id'] as int,
     );
   }
 }

@@ -5,6 +5,8 @@ import '../models/doctor.dart';
 import 'add_doctor_screen.dart';  // Create this file (see below)
 
 class DoctorListScreen extends StatefulWidget {
+  const DoctorListScreen({super.key});
+
   @override
   _DoctorListScreenState createState() => _DoctorListScreenState();
 }
@@ -31,10 +33,10 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Doctors'),
+        title: const Text('Doctors'),
         actions: [
           IconButton(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             onPressed: () {
               Navigator.push(
                 context,
@@ -53,7 +55,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
               decoration: InputDecoration(
                 labelText: 'Search Doctors',
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: () {
                     Provider.of<DoctorProvider>(context, listen: true ).searchDoctors(_searchController.text);
                   },
@@ -68,9 +70,9 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
             child: Consumer<DoctorProvider>(
               builder: (context, doctorProvider, child) {
                 if (doctorProvider.isLoading) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (doctorProvider.doctors.isEmpty) {
-                  return Center(child: Text('No doctors found.'));
+                  return const Center(child: Text('No doctors found.'));
                 } else {
                   return ListView.builder(
                     itemCount: doctorProvider.doctors.length,
@@ -93,12 +95,12 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
 class DoctorListItem extends StatelessWidget {
   final Doctor doctor;
 
-  const DoctorListItem({Key? key, required this.doctor}) : super(key: key);
+  const DoctorListItem({super.key, required this.doctor});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(8.0),
+      margin: const EdgeInsets.all(8.0),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -109,7 +111,7 @@ class DoctorListItem extends StatelessWidget {
                 children: [
                   Text(
                     doctor.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text('Phone: ${doctor.phone}'),
                   Text('Cash Percentage: ${doctor.cashPercentage}%'),
@@ -118,7 +120,7 @@ class DoctorListItem extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: Icon(Icons.edit, color: Colors.blue),
+              icon: const Icon(Icons.edit, color: Colors.blue),
               onPressed: () {
                 _showEditDialog(context, doctor);
               },
@@ -130,29 +132,29 @@ class DoctorListItem extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, Doctor doctor) {
-    final _formKey = GlobalKey<FormState>();
-    final _nameController = TextEditingController(text: doctor.name);
-    final _phoneController = TextEditingController(text: doctor.phone);
-    final _cashPercentageController = TextEditingController(text: doctor.cashPercentage.toString());
-    final _companyPercentageController = TextEditingController(text: doctor.companyPercentage.toString());
-    final _staticWageController = TextEditingController(text: doctor.staticWage.toString());
-    final _labPercentageController = TextEditingController(text: doctor.labPercentage.toString());
-    final _specialistIdController = TextEditingController(text: doctor.specialistId.toString());
-    final _startController = TextEditingController(text: doctor.start.toString());
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: doctor.name);
+    final phoneController = TextEditingController(text: doctor.phone);
+    final cashPercentageController = TextEditingController(text: doctor.cashPercentage.toString());
+    final companyPercentageController = TextEditingController(text: doctor.companyPercentage.toString());
+    final staticWageController = TextEditingController(text: doctor.staticWage.toString());
+    final labPercentageController = TextEditingController(text: doctor.labPercentage.toString());
+    final specialistIdController = TextEditingController(text: doctor.specialistId.toString());
+    final startController = TextEditingController(text: doctor.start.toString());
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Edit Doctor"),
+          title: const Text("Edit Doctor"),
           content: SingleChildScrollView(
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 children: [
                   TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(labelText: 'Name'),
+                    controller: nameController,
+                    decoration: const InputDecoration(labelText: 'Name'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the doctor\'s name.';
@@ -161,8 +163,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _phoneController,
-                    decoration: InputDecoration(labelText: 'Phone'),
+                    controller: phoneController,
+                    decoration: const InputDecoration(labelText: 'Phone'),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter the doctor\'s phone number.';
@@ -171,8 +173,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _cashPercentageController,
-                    decoration: InputDecoration(labelText: 'Cash Percentage'),
+                    controller: cashPercentageController,
+                    decoration: const InputDecoration(labelText: 'Cash Percentage'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -185,8 +187,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _companyPercentageController,
-                    decoration: InputDecoration(labelText: 'Company Percentage'),
+                    controller: companyPercentageController,
+                    decoration: const InputDecoration(labelText: 'Company Percentage'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -199,8 +201,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _staticWageController,
-                    decoration: InputDecoration(labelText: 'Static Wage'),
+                    controller: staticWageController,
+                    decoration: const InputDecoration(labelText: 'Static Wage'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -213,8 +215,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _labPercentageController,
-                    decoration: InputDecoration(labelText: 'Lab Percentage'),
+                    controller: labPercentageController,
+                    decoration: const InputDecoration(labelText: 'Lab Percentage'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -227,8 +229,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _specialistIdController,
-                    decoration: InputDecoration(labelText: 'Specialist ID'),
+                    controller: specialistIdController,
+                    decoration: const InputDecoration(labelText: 'Specialist ID'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -241,8 +243,8 @@ class DoctorListItem extends StatelessWidget {
                     },
                   ),
                   TextFormField(
-                    controller: _startController,
-                    decoration: InputDecoration(labelText: 'Start'),
+                    controller: startController,
+                    decoration: const InputDecoration(labelText: 'Start'),
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -260,25 +262,25 @@ class DoctorListItem extends StatelessWidget {
           ),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text("Save", style: TextStyle(color: Colors.blue)),
+              child: const Text("Save", style: TextStyle(color: Colors.blue)),
               onPressed: () {
-                if (_formKey.currentState!.validate()) {
+                if (formKey.currentState!.validate()) {
                   final updatedDoctor = Doctor(
                     id: doctor.id,
-                    name: _nameController.text,
-                    phone: _phoneController.text,
-                    cashPercentage: double.parse(_cashPercentageController.text),
-                    companyPercentage: double.parse(_companyPercentageController.text),
-                    staticWage: double.parse(_staticWageController.text),
-                    labPercentage: double.parse(_labPercentageController.text),
-                    specialistId: int.parse(_specialistIdController.text),
-                    start: int.parse(_startController.text),
+                    name: nameController.text,
+                    phone: phoneController.text,
+                    cashPercentage: double.parse(cashPercentageController.text),
+                    companyPercentage: double.parse(companyPercentageController.text),
+                    staticWage: double.parse(staticWageController.text),
+                    labPercentage: double.parse(labPercentageController.text),
+                    specialistId: int.parse(specialistIdController.text),
+                    start: int.parse(startController.text),
                     createdAt: doctor.createdAt,
                     updatedAt: doctor.updatedAt,
                   );

@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main_screen.dart'; // Import your main screen
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -22,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      final url = Uri(host: host,scheme: schema,path: "${path}/login") ;// Replace with your login endpoint
+      final url = Uri(host: host,scheme: schema,path: "$path/login") ;// Replace with your login endpoint
 
       try {
         final response = await http.post(
@@ -53,14 +55,14 @@ class _LoginScreenState extends State<LoginScreen> {
           // Handle login failure (e.g., display an error message)
           print('Login failed: ${response.statusCode}');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Invalid username or password')),
+            const SnackBar(content: Text('Invalid username or password')),
           );
         }
       } catch (error) {
         // Handle network errors, etc.
         print('Error during login: $error');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred during login')),
+          const SnackBar(content: Text('An error occurred during login')),
         );
       } finally {
         setState(() {
@@ -74,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -84,16 +86,16 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
 
               Image.asset('assets/logo.png',width: 150,height: 150,),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'username'),
+                decoration: const InputDecoration(labelText: 'username'),
                 keyboardType: TextInputType.text,
               
               ),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: 'Password'),
+                decoration: const InputDecoration(labelText: 'Password'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -102,10 +104,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _isLoading ? null : _login,
-                child: _isLoading ? CircularProgressIndicator() : Text('Login'),
+                child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
               ),
             ],
           ),

@@ -1,8 +1,13 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
+import 'package:jawda/screens/ledger.dart';
 import '../models/finance_account.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart'; // Import syncfusion_flutter_pdfviewer
 
 class FinanceAccountListScreen extends StatefulWidget {
   @override
@@ -12,6 +17,8 @@ class FinanceAccountListScreen extends StatefulWidget {
 class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
   List<FinanceAccount> _accounts = [];
   bool _isLoading = false;
+  Uint8List? _pdfData; // Store PDF data
+  bool _isPdfLoading = false;
 
   @override
   void initState() {
@@ -52,6 +59,45 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
     }
   }
 
+  Future<void> _generateAndShowPdf(int accountId) async {
+    setState(() {
+      _isPdfLoading = true;
+      _pdfData = null; // Reset previous PDF data
+    });
+
+    final url = Uri(scheme: schema,host: host,path: path +'ledger/${accountId}'); // Replace with your PDF generation endpoint
+    print(url);
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+ 
+        final String base64Pdf = response.body;
+
+        setState(() {
+          _pdfData = base64Decode(base64Pdf);
+        });
+
+
+      } else {
+        print('Failed to generate PDF: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate PDF')),
+        );
+      }
+    } catch (error) {
+      print('Error generating PDF: $error');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while generating PDF')),
+      );
+    } finally {
+      setState(() {
+        _isPdfLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,31 +108,44 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
           ? Center(child: CircularProgressIndicator())
           : _accounts.isEmpty
               ? Center(child: Text('No finance accounts found.'))
-              : ListView.builder(
-                  itemCount: _accounts.length,
-                  itemBuilder: (context, index) {
-                    final account = _accounts[index];
-                    return Card(
-                      margin: EdgeInsets.all(8.0),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              account.name,
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              : Column( // Use a Column to stack the list and PDF viewer
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _accounts.length,
+                        itemBuilder: (context, index) {
+                          final account = _accounts[index];
+                            final totalDebit = account.debits.fold(0, (previousValue, element) {
+                              return previousValue + element.amount.toInt();
+                            },);
+                          return ListTile(
+                            title: Text(account.name),
+                            subtitle: Text(NumberFormat('#,###.##','en_Us').format(totalDebit)),
+                            leading: IconButton(
+                              icon: Icon(Icons.picture_as_pdf),
+                              onPressed: () {
+                                _generateAndShowPdf(account.id); // Pass accountId
+                              },
                             ),
-                            Text('Code: ${account.code}'),
-                            Text('Debit/Credit: ${account.debits.fold(0, ( previousValue, element) =>  previousValue + element.amount.toInt() )}'),
-                            Text('Balance: ${account.balance}'),
-                            if (account.description != null)
-                              Text('Description: ${account.description}'),
-                          ],
-                        ),
+                            trailing: IconButton(onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                return Ledger(financeAccount:  account);
+                              },));
+                            }, icon: Icon(Icons.remove_red_eye)),
+                          );
+
+                        },
                       ),
-                    );
-                  },
+                    ),
+                    if (_isPdfLoading)
+                      Center(child: CircularProgressIndicator())
+                    else if (_pdfData != null)
+                      Expanded(
+                        child: SfPdfViewer.memory( // Display PDF using syncfusion_flutter_pdfviewer
+                          _pdfData!,
+                        ),
+                      )
+                  ],
                 ),
     );
   }

@@ -6,14 +6,16 @@ import 'doctor_list_screen.dart';
 import 'finance_screen.dart'; // Import FinanceScreen
 
 class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Main Menu'),
+        title: const Text('Main Menu'),
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
+            icon: const Icon(Icons.logout),
             onPressed: () {
               _logout(context);
             },
@@ -23,7 +25,7 @@ class MainScreen extends StatelessWidget {
       body: Column(
 
         children: [
-          AmountSummary(bankAmount: 1000, cashAmount: 500),
+          const AmountSummary(bankAmount: 1000, cashAmount: 500),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -40,11 +42,11 @@ class MainScreen extends StatelessWidget {
                   }),
                   _buildGridItem(context, 'Settings', Icons.settings, () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Settings page is under construction')));
+                        const SnackBar(content: Text('Settings page is under construction')));
                   }),
                   _buildGridItem(context, 'Laboratory', Icons.science, () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Laboratory page is under construction')));
+                        const SnackBar(content: Text('Laboratory page is under construction')));
                   }),
                   _buildGridItem(context, 'Finance', Icons.attach_money, () {
                     Navigator.push(
@@ -78,7 +80,7 @@ class MainScreen extends StatelessWidget {
               size: 50.0,
               color: Colors.blue,
             ),
-            SizedBox(height: 10.0),
+            const SizedBox(height: 10.0),
             Text(
               title,
               style: TextStyle(

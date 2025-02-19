@@ -1,46 +1,95 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class AmountSummary extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:jawda/constansts.dart';
+import 'package:jawda/models/finance_account.dart';
+import 'package:http/http.dart' as http;
+
+class AmountSummary extends StatefulWidget {
   final double bankAmount;
   final double cashAmount;
 
   const AmountSummary({
-    Key? key,
+    super.key,
     required this.bankAmount,
     required this.cashAmount,
-  }) : super(key: key);
+  });
+
+  @override
+  State<AmountSummary> createState() => _AmountSummaryState();
+}
+
+class _AmountSummaryState extends State<AmountSummary> {
+   FinanceAccount? bankAccount;
+   FinanceAccount? cashAccount;
+
+  Future<List<FinanceAccount>> _getDate () async{
+      final url =  Uri(scheme: schema,host: host,path: '$path/financeAccounts');
+      try {
+         Response response =   await http.get(url);
+      if(response.statusCode == 200){
+        List<dynamic> data =   jsonDecode(response.body);
+       List<FinanceAccount> financeAccounts=   data.map((fjson)=>FinanceAccount.fromJson(fjson)).toList();
+
+         bankAccount =   financeAccounts.firstWhere((a)=>a.id == 16);
+         cashAccount =   financeAccounts.firstWhere((a)=>a.id == 5);
+        
+        print(data);
+        return financeAccounts;
+      } 
+     
+      } catch (e) {
+        print(e.toString());
+        rethrow;
+      }
+     return [];
+   } 
 
   @override
   Widget build(BuildContext context) {
-    double totalAmount = bankAmount + cashAmount;
+    double totalAmount = widget.bankAmount + widget.cashAmount;
 
-    return Card(
+    return FutureBuilder(future: _getDate(), builder: (context, snapshot) {
+      if(snapshot.connectionState == ConnectionState.waiting){
+        return const CircularProgressIndicator();
+      }
+      if(snapshot.hasError){
+        return Text(snapshot.error.toString());
+      }else{
+         return Card(
       elevation: 4,
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Amount Summary',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
-            _buildAmountRow('Bank Amount', bankAmount, Colors.blue),
-            _buildAmountRow('Cash Amount', cashAmount, Colors.green),
-            Divider(height: 20, thickness: 1),
-            _buildAmountRow('Total Amount', totalAmount, Colors.purple, isTotal: true),
+            const SizedBox(height: 10),
+            _buildAmountRow('Bank Amount', NumberFormat('#,###.##','en_Us').format(bankAccount!.balance), Colors.blue),
+            _buildAmountRow('Cash Amount',  NumberFormat('#,###.##','en_Us').format(cashAccount!.balance), Colors.green),
+            const Divider(height: 20, thickness: 1),
+            _buildAmountRow('Total Amount',NumberFormat('#,###.##','en_Us').format( bankAccount!.balance + cashAccount!.balance ), Colors.purple, isTotal: true),
           ],
         ),
       ),
     );
+      }
+     
+    },);
+
+    
   }
 
-  Widget _buildAmountRow(String label, double amount, Color color, {bool isTotal = false}) {
+  Widget _buildAmountRow(String label, String amount, Color color, {bool isTotal = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -55,7 +104,7 @@ class AmountSummary extends StatelessWidget {
             ),
           ),
           Text(
-            amount.toStringAsFixed(2), // Format to 2 decimal places
+            amount, // Format to 2 decimal places
             style: TextStyle(
               fontSize: 16,
               fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
