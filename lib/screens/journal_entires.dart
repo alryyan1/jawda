@@ -70,129 +70,133 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
           ? Center(child: CircularProgressIndicator())
           : _entries.isEmpty
               ? Center(child: Text('No journal entries found.'))
-              : SingleChildScrollView( // Make the table scrollable horizontally
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    border: TableBorder.all(),
-                    columns: [
-                      DataColumn(label: Center(child: Text('Date'))),
-                      DataColumn(label: Center(child: Text('Entry No.'))),
-                      DataColumn(label: Center(child: Text('Account'))),
-                      DataColumn(label: Center(child: Text('Debit'))),
-                      DataColumn(label: Center(child: Text('Credit'))),
-                    ],
-                    rows: _entries.mapIndexed((i, entry) {
-                      final debitLength = entry.debit.length;
-                      final creditLength = entry.credit.length;
-                      final maxRows = debitLength > creditLength ? debitLength : creditLength;
-
-                      List<DataRow> rows = [];
-
-                      // Main Row (Date, Entry No.)
-                      rows.add(
-                        DataRow(
-                          cells: [
-                            DataCell(
-                              Center(
-                                child: Text(DateFormat('yyyy-MM-dd').format(entry.createdAt)),
-                              ),
-                            ),
-                            DataCell(
-                              Center(
-                                child: Text(entry.id.toString()),
-                              ),
-                            ),
-                            DataCell(Container()), // Placeholder
-                            DataCell(Container()), // Placeholder
-                            DataCell(Container()), // Placeholder
-                          ],
-                        ),
-                      );
-
-
-                      // Debit Rows
-                      for (int j = 0; j < debitLength; j++) {
-                        final e = entry.debit[j];
+              : SingleChildScrollView(
+                child: SingleChildScrollView( // Make the table scrollable horizontally
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      border: TableBorder.all(),
+                      columns: [
+                        DataColumn(label: Center(child: Text('Date'))),
+                        DataColumn(label: Center(child: Text('Entry No.'))),
+                        DataColumn(label: Center(child: Text('Account'))),
+                        DataColumn(label: Center(child: Text('Debit'))),
+                        DataColumn(label: Center(child: Text('Credit'))),
+                      ],
+                      rows: _entries.mapIndexed((i, entry) {
+                        final debitLength = entry.debit.length;
+                        
+                        final creditLength = entry.credit.length;
+                        final maxRows = debitLength > creditLength ? debitLength : creditLength;
+                
+                        List<DataRow> rows = [];
+                
+                        // Main Row (Date, Entry No.)
                         rows.add(
                           DataRow(
-                            color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-                              if (i % 2 == 0) {
-                                return Colors.grey.withOpacity(0.1); // Light grey background for even rows
-                              }
-                              return null; // Use default value for other states and odd rows.
-                            }),
                             cells: [
-                              DataCell(Container()), // Placeholder
-                              DataCell(Container()), // Placeholder
                               DataCell(
-                                Text((debitLength > 1 && j == 0 ? 'من مذكورين   ' : 'من ح/ ') + (e.account?.name ?? '')),
-                              ),
-                              DataCell(
-                                Center(child: Text(formatNumber(e.amount))),
-                              ),
-                              DataCell(Container()), // Placeholder
-                            ],
-                          ),
-                        );
-                      }
-
-                      // Credit Rows
-                      for (int j = 0; j < creditLength; j++) {
-                        final e = entry.credit[j];
-                        rows.add(
-                          DataRow(
-                            color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-                              if (i % 2 == 0) {
-                                return Colors.grey.withOpacity(0.1); // Light grey background for even rows
-                              }
-                              return null; // Use default value for other states and odd rows.
-                            }),
-                            cells: [
-                              DataCell(Container()), // Placeholder
-                              DataCell(Container()), // Placeholder
-                              DataCell(
-                                Text((creditLength > 1 && j == 0 ? 'الي مذكورين .......   ' : 'الي ح/ ....... ') + (e.account?.name ?? '')),
-                              ),
-                              DataCell(Container()), // Placeholder
-                              DataCell(
-                                Center(child: Text(formatNumber(e.amount))),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      // Description Row
-                      rows.add(
-                        DataRow(
-                          color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-                            if (i % 2 == 0) {
-                              return Colors.grey.withOpacity(0.1); // Light grey background for even rows
-                            }
-                            return null; // Use default value for other states and odd rows.
-                          }),
-                          cells: [
-                            DataCell(Container()), // Placeholder
-                            DataCell(Container()), // Placeholder
-                            DataCell(
-                              Center(
-                                child: Text(
-                                  entry.description,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                Center(
+                                  child: Text(DateFormat('yyyy-MM-dd').format(entry.createdAt)),
                                 ),
                               ),
-                              
+                              DataCell(
+                                Center(
+                                  child: Text(entry.id.toString()),
+                                ),
+                              ),
+                              DataCell(Container()), // Placeholder
+                              DataCell(Container()), // Placeholder
+                              DataCell(Container()), // Placeholder
+                            ],
+                          ),
+                        );
+                
+                
+                        // Debit Rows
+                        for (int j = 0; j < debitLength; j++) {
+                          final e = entry.debit[j];
+                          rows.add(
+                            DataRow(
+                              color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+                                if (i % 2 == 0) {
+                                  return Colors.grey.withOpacity(0.1); // Light grey background for even rows
+                                }
+                                return null; // Use default value for other states and odd rows.
+                              }),
+                              cells: [
+                                DataCell(Container()), // Date
+                                DataCell(Container()), // Entry No
+                                DataCell(
+                                  Text((debitLength > 1 && j == 0 ? 'من مذكورين   ' : 'من ح/ ') + (e.account?.name ?? '')),
+                                ),
+                                DataCell(
+                                  Center(child: Text(formatNumber(e.amount))),
+                                ),
+                                DataCell(Container()), // Credit placeholder
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-
-
-                      return rows;
-                    }).expand((element) => element).toList(),
+                          );
+                        }
+                
+                        // Credit Rows
+                        for (int j = 0; j < creditLength; j++) {
+                          final e = entry.credit[j];
+                          rows.add(
+                            DataRow(
+                              color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+                                if (i % 2 == 0) {
+                                  return Colors.grey.withOpacity(0.1); // Light grey background for even rows
+                                }
+                                return null; // Use default value for other states and odd rows.
+                              }),
+                              cells: [
+                                DataCell(Container()), // Date
+                                DataCell(Container()), // Entry No
+                                DataCell(
+                                  Text((creditLength > 1 && j == 0 ? 'الي مذكورين .......   ' : 'الي ح/ ....... ') + (e.account?.name ?? '')),
+                                ),
+                                DataCell(Container()), // Debit placeholder
+                                DataCell(
+                                  Center(child: Text(formatNumber(e.amount))),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                
+                        // Description Row
+                        rows.add(
+                          DataRow(
+                            color: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
+                              if (i % 2 == 0) {
+                                return Colors.grey.withOpacity(0.1); // Light grey background for even rows
+                              }
+                              return null; // Use default value for other states and odd rows.
+                            }),
+                            cells: [
+                              DataCell(Container()), // Date
+                              DataCell(Container()), // Entry No
+                              DataCell(
+                                Center(
+                                  child: Text(
+                                    entry.description,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
+                              DataCell(Container()), // Debit placeholder
+                              DataCell(Container()), // Credit placeholder
+                            ],
+                          ),
+                        );
+                
+                
+                        return rows;
+                      }).expand((element) => element).toList(),
+                    ),
                   ),
-                ),
+              ),
             );
   }
 }

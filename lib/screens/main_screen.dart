@@ -6,7 +6,7 @@ import 'doctor_list_screen.dart';
 import 'finance_screen.dart'; // Import FinanceScreen
 
 class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+  const MainScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +22,27 @@ class MainScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Call the refresh method from AmountSummary
+          // This assumes that AmountSummary has a public method or a Provider/State management solution
+          // to trigger the data refresh.
+           // You may need to use a GlobalKey or a ValueNotifier to trigger the refresh
+          // For simplicity, we will show this message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Refreshing Amount Summary...')),
+          );
 
-        children: [
-          const AmountSummary(bankAmount: 1000, cashAmount: 500),
-          Expanded(
-            child: Padding(
+          // Implement the actual refresh logic here.
+        },
+        child: ListView( // Use ListView to make the whole screen scrollable
+          children: [
+            const AmountSummary(bankAmount: 1000, cashAmount: 500),
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.count(
+                shrinkWrap: true, // Important to avoid scroll issues
+                physics: NeverScrollableScrollPhysics(), // Disable GridView's scrolling
                 crossAxisCount: 2, // Two columns
                 crossAxisSpacing: 16.0,
                 mainAxisSpacing: 16.0,
@@ -58,8 +71,8 @@ class MainScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
