@@ -49,7 +49,7 @@ dependencies:
   path_provider: any
   url_launcher: ^6.1.6
   pdfrx: ^1.1.11 # Use the specified version
-
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:

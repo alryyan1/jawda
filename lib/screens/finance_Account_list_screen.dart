@@ -30,6 +30,7 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
   }
 
   Future<void> _fetchAccounts() async {
+       if (!mounted) return; //
     setState(() {
       _isLoading = true;
     });
@@ -61,6 +62,7 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
             content: Text('An error occurred while fetching finance accounts')),
       );
     } finally {
+         if (!mounted) return; //
       setState(() {
         _isLoading = false;
       });
