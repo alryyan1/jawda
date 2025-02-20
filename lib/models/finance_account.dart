@@ -59,6 +59,7 @@ class Credit {
   final DateTime createdAt;
   final DateTime updatedAt;
   final FinanceEntry? entry;
+  final FinanceAccount? account;
 
   Credit({
     required this.id,
@@ -68,6 +69,7 @@ class Credit {
     required this.createdAt,
     required this.updatedAt,
     required this.entry,
+    required this.account,
   });
 
   factory Credit.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,7 @@ class Credit {
       amount: (json['amount'] as num).toDouble(),
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      account: json['account'] !=null ? FinanceAccount.fromJson(json['account'] as Map<String, dynamic> ) :null,
       entry: json['entry']!=null ? FinanceEntry.fromJson(json['entry'] as Map<String, dynamic> ):null,
 
     );
@@ -91,6 +94,7 @@ class Debit {
   final DateTime createdAt;
   final DateTime updatedAt;
   final FinanceEntry? entry;
+  final FinanceAccount? account;
 
   Debit({
     required this.id,
@@ -100,6 +104,8 @@ class Debit {
     required this.createdAt,
     required this.updatedAt,
     required this.entry,
+        required this.account,
+    
   });
 
   factory Debit.fromJson(Map<String, dynamic> json) {
@@ -111,6 +117,7 @@ class Debit {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       entry: json['entry']!=null ? FinanceEntry.fromJson(json['entry'] as Map<String, dynamic> ):null,
+      account: json['account'] != null ? FinanceAccount.fromJson(json['account'] as Map<String, dynamic>) :null,
     );
   }
 }
@@ -119,18 +126,24 @@ class FinanceEntry {
   DateTime createdAt;
   DateTime updatedAt;
   String description;
+  final List<Debit> debit;
+  final List<Credit> credit;
   int id;
   FinanceEntry({
     required this.createdAt,
     required this.updatedAt,
     required this.description,
     required this.id,
+    required this.debit,
+    required this.credit,
   });
   factory FinanceEntry.fromJson(Map<String, dynamic> json) {
     return FinanceEntry(
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       description: json['description'] as String,
+       debit: (json['debit'] as List<dynamic>).map((item) => Debit.fromJson(item)).toList(),
+      credit: (json['credit'] as List<dynamic>).map((item) => Credit.fromJson(item)).toList(),
       id: json['id'] as int,
     );
   }

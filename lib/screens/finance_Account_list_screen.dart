@@ -1,17 +1,20 @@
 import 'dart:convert';
+import 'dart:io' as io; // Import dart:io
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/screens/ledger.dart';
+import 'package:jawda/screens/pdf_veiwer.dart';
 import '../models/finance_account.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart'; // Import syncfusion_flutter_pdfviewer
+import 'package:path_provider/path_provider.dart'; // Import path_provider
+import 'package:pdfrx/pdfrx.dart'; // Import pdfrx
 
 class FinanceAccountListScreen extends StatefulWidget {
   @override
-  _FinanceAccountListScreenState createState() => _FinanceAccountListScreenState();
+  _FinanceAccountListScreenState createState() =>
+      _FinanceAccountListScreenState();
 }
 
 class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
@@ -31,14 +34,18 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
       _isLoading = true;
     });
 
-    final url = Uri( scheme: schema,host: host,path: '${path}/financeAccounts'); // Replace with your API endpoint
+    final url = Uri(
+        scheme: schema,
+        host: host,
+        path: '${path}/financeAccounts'); // Replace with your API endpoint
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final List<dynamic> decodedData = json.decode(response.body);
-        _accounts = decodedData.map((item) => FinanceAccount.fromJson(item)).toList();
+        _accounts =
+            decodedData.map((item) => FinanceAccount.fromJson(item)).toList();
       } else {
         print('Failed to load accounts: ${response.statusCode}');
         // Handle error (e.g., show a snackbar)
@@ -50,7 +57,8 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
       print('Error fetching accounts: $error');
       // Handle network errors, etc.
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while fetching finance accounts')),
+        SnackBar(
+            content: Text('An error occurred while fetching finance accounts')),
       );
     } finally {
       setState(() {
@@ -59,27 +67,44 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
     }
   }
 
-  Future<void> _generateAndShowPdf(int accountId) async {
+  String cleanBase64(String base64String) {
+    // Remove everything before the actual base64 data
+    RegExp exp = RegExp(r'base64,(.*)');
+    Match? match = exp.firstMatch(base64String);
+
+    if (match != null) {
+      return match.group(1)!.trim();
+    }
+
+    return base64String
+        .replaceAll(RegExp(r'\s+'), '') // Remove whitespaces & newlines
+        .trim();
+  }
+
+  Future<Uint8List?> _generateAndShowPdf(int accountId) async {
     setState(() {
       _isPdfLoading = true;
       _pdfData = null; // Reset previous PDF data
     });
 
-    final url = Uri(scheme: schema,host: host,path: path +'ledger/${accountId}'); // Replace with your PDF generation endpoint
-    print(url);
+    final url = Uri(
+        scheme: schema,
+        host: host,
+        path: path + '/ledger/${accountId}',
+        queryParameters: {'base64': '1'});
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
- 
+        // final Map<String, dynamic> responseData = json.decode(response.body);
         final String base64Pdf = response.body;
+        var cleaned = cleanBase64(base64Pdf);
+        // print(base64Pdf);
 
         setState(() {
-          _pdfData = base64Decode(base64Pdf);
+          _pdfData = base64Decode(cleaned);
         });
-
-
       } else {
         print('Failed to generate PDF: ${response.statusCode}');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -96,6 +121,7 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
         _isPdfLoading = false;
       });
     }
+    return _pdfData;
   }
 
   @override
@@ -108,43 +134,48 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
           ? Center(child: CircularProgressIndicator())
           : _accounts.isEmpty
               ? Center(child: Text('No finance accounts found.'))
-              : Column( // Use a Column to stack the list and PDF viewer
+              : Column(
+                  // Use a Column to stack the list and PDF viewer
                   children: [
                     Expanded(
                       child: ListView.builder(
                         itemCount: _accounts.length,
                         itemBuilder: (context, index) {
                           final account = _accounts[index];
-                            final totalDebit = account.debits.fold(0, (previousValue, element) {
+                          final totalDebit = account.debits.fold(
+                            0,
+                            (previousValue, element) {
                               return previousValue + element.amount.toInt();
-                            },);
+                            },
+                          );
                           return ListTile(
                             title: Text(account.name),
-                            subtitle: Text(NumberFormat('#,###.##','en_Us').format(totalDebit)),
+                            subtitle: Text(NumberFormat('#,###.##', 'en_Us')
+                                .format(totalDebit)),
                             leading: IconButton(
                               icon: Icon(Icons.picture_as_pdf),
-                              onPressed: () {
-                                _generateAndShowPdf(account.id); // Pass accountId
+                              onPressed: () async{
+                              final pdfData =   await _generateAndShowPdf(
+                                    account.id); // Pass accountId
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                  return MyPdfViewer(pdfData: pdfData,id: account.id.toString(),);
+                                },));
                               },
                             ),
-                            trailing: IconButton(onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return Ledger(financeAccount:  account);
-                              },));
-                            }, icon: Icon(Icons.remove_red_eye)),
+                            trailing: IconButton(
+                                onPressed: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) {
+                                      return Ledger(financeAccount: account);
+                                    },
+                                  ));
+                                },
+                                icon:  Icon(Icons.remove_red_eye)),
                           );
-
                         },
                       ),
                     ),
-                    if (_isPdfLoading)
-                      Center(child: CircularProgressIndicator())
-                    else if (_pdfData != null)
-                      Expanded(
-                        child: SfPdfViewer.memory( // Display PDF using syncfusion_flutter_pdfviewer
-                          _pdfData!,
-                        ),
-                      )
+                     
                   ],
                 ),
     );

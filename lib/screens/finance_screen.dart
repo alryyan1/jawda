@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jawda/screens/add_journal_entry.dart';
+import 'package:jawda/screens/journal_entires.dart';
+import 'package:jawda/screens/pdf_veiwer.dart';
 import 'finance_account_list_screen.dart'; // Import FinanceAccountListScreen
 // import 'journal_entries_screen.dart';
 // import 'trial_balance_screen.dart';
@@ -42,9 +44,11 @@ class FinanceScreen extends StatelessWidget {
                   );
                 }),
                 _buildGridItem(context, 'Journal Entries', Icons.book, () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content:
-                          Text('Journal Entries page is under construction')));
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return JournalEntriesScreen();
+                    },
+                  ));
                 }),
                 _buildGridItem(context, 'Trial Balance', Icons.equalizer, () {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -56,9 +60,11 @@ class FinanceScreen extends StatelessWidget {
                       content: Text('Ledger page is under construction')));
                 }),
                 _buildGridItem(context, 'add Entry', Icons.description, () {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                    return AddJournalEntryScreen();
-                  },));
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return AddJournalEntryScreen();
+                    },
+                  ));
                 }),
               ],
             ),

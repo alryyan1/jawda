@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'main_screen.dart'; // Import your main screen
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      final url = Uri(host: host,scheme: schema,path: "$path/login") ;// Replace with your login endpoint
+      final url = Uri(host: host, scheme: schema, path: "$path/login"); // Replace with your login endpoint
 
       try {
         final response = await http.post(
@@ -74,42 +74,78 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
+    final colorScheme = Theme.of(context).colorScheme;
 
-              Image.asset('assets/logo.png',width: 150,height: 150,),
-              const SizedBox(height: 10,),
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(labelText: 'username'),
-                keyboardType: TextInputType.text,
-              
-              ),
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your password';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _login,
-                child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
-              ),
-            ],
+    return Scaffold(
+      backgroundColor: colorScheme.background, // Use background color from theme
+      body: Center(
+        child: SingleChildScrollView( // Make the content scrollable
+          padding: const EdgeInsets.all(32.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Image.asset(
+                  'assets/logo.png',
+                  width: 150,
+                  height: 150,
+                ),
+                const SizedBox(height: 32),
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(
+                    labelText: 'Username',
+                    filled: true,
+                    fillColor: colorScheme.surface, // Use surface color from theme
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    labelStyle: TextStyle(color: colorScheme.onSurface), // Use onSurface color from theme
+                  ),
+                  keyboardType: TextInputType.text,
+                  style: TextStyle(color: colorScheme.onBackground), // Use onBackground color from theme
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    filled: true,
+                    fillColor: colorScheme.surface, // Use surface color from theme
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    labelStyle: TextStyle(color: colorScheme.onSurface), // Use onSurface color from theme
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your password';
+                    }
+                    return null;
+                  },
+                  style: TextStyle(color: colorScheme.onBackground), // Use onBackground color from theme
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colorScheme.primary, // Use primary color from theme
+                    foregroundColor: colorScheme.onPrimary, // Use onPrimary color from theme
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

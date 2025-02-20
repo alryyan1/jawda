@@ -46,6 +46,9 @@ dependencies:
   printing: ^5.11.0
   universal_html: ^2.2.4
   syncfusion_flutter_pdfviewer: ^28.2.6 # Use the latest version
+  path_provider: any
+  url_launcher: ^6.1.6
+  pdfrx: ^1.1.11 # Use the specified version
 
 
 dev_dependencies:
