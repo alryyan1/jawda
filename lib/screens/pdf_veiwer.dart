@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart'; // Import flutter foundation for kIsWeb
 import 'package:flutter/material.dart';
@@ -8,9 +9,8 @@ import 'package:path_provider/path_provider.dart'; // Import path_provider
 
 class MyPdfViewer extends StatefulWidget {
   Uint8List? pdfData;
-  final String id;
 
-  MyPdfViewer({Key? key, required this.pdfData, required this.id}) : super(key: key);
+  MyPdfViewer({Key? key, required this.pdfData}) : super(key: key);
 
   @override
   _MyPdfViewerState createState() => _MyPdfViewerState();
@@ -26,6 +26,7 @@ class _MyPdfViewerState extends State<MyPdfViewer> {
   }
 
   Future<void> _preparePdfForSharing() async {
+    int randomInt =  Random().nextInt(1);
     if (widget.pdfData != null) {
       if (kIsWeb) {
         // Web: No need to save the file locally.
@@ -33,7 +34,7 @@ class _MyPdfViewerState extends State<MyPdfViewer> {
       } else {
         // Mobile: Save the file to local storage.
         final directory = await getApplicationDocumentsDirectory();
-        final file = File('${directory.path}/finance_account_${widget.id}.pdf');
+        final file = File('${directory.path}/report_${randomInt}.pdf');
         await file.writeAsBytes(widget.pdfData!);
         setState(() {
           _localPath = file.path;
@@ -57,6 +58,7 @@ class _MyPdfViewerState extends State<MyPdfViewer> {
 
   @override
   Widget build(BuildContext context) {
+        int randomInt =  Random().nextInt(1);
     return Scaffold(  // Wrap with Scaffold to add AppBar
       appBar: AppBar(
         title: Text('PDF Viewer'),
@@ -71,7 +73,7 @@ class _MyPdfViewerState extends State<MyPdfViewer> {
         child: Expanded(
           child: (widget.pdfData != null)
               ? PdfViewer.data(
-                  sourceName: widget.id,
+                  sourceName: randomInt.toString(),
                   widget.pdfData!,
                 )
               : Center(child: Text('No PDF data available')), // Handle null PDF data

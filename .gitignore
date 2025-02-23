@@ -30,12 +30,14 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
-
+/android
+/windows
 # Symbolication related
 app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+android/app/.cxx/
 
 # Android Studio will place build artifacts here
 /android/app/debug

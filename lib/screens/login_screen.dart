@@ -2,8 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jawda/constansts.dart';
+import 'package:jawda/screens/laundry_screen.dart';
+import 'package:jawda/screens/report_by_shift.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main_screen.dart'; // Import your main screen
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Navigate to the main screen
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => MainScreen()),
+            MaterialPageRoute(builder: (context) => LaundryScreen()),
           );
         } else {
           // Handle login failure (e.g., display an error message)
