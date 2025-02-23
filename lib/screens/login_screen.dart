@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true; // Track password visibility
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -104,6 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: BorderSide.none,
                     ),
                     labelStyle: TextStyle(color: colorScheme.onSurface), // Use onSurface color from theme
+                    suffixIcon: Icon(Icons.person, color: colorScheme.onSurfaceVariant), // Add person icon
                   ),
                   keyboardType: TextInputType.text,
                   style: TextStyle(color: colorScheme.onBackground), // Use onBackground color from theme
@@ -120,8 +122,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderSide: BorderSide.none,
                     ),
                     labelStyle: TextStyle(color: colorScheme.onSurface), // Use onSurface color from theme
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                   ),
-                  obscureText: true,
+                  obscureText: _obscurePassword, // Toggle password visibility
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
