@@ -78,12 +78,12 @@ Future<Uint8List?> _generateAndShowPdf(String reportName,DateTime? selectedDate)
       _isPdfLoading = true;
       _pdfData = null; // Reset previous PDF data
     });
-
+final pathVariable =  _selectedBranch =='Branch One' ?  'kitchen-laravel/public/api' : 'two/new-branch/public/api';
     final url = Uri(
         scheme: schema,
         host: host,
-        path: path + '/${reportName}',
-        queryParameters: {'date':DateFormat('yyyy-MM-DD').format(selectedDate!)});
+        path: pathVariable + '/${reportName}',
+        queryParameters: {'date':DateFormat('yyyy-MM-dd').format(selectedDate!)});
 
     try {
       final response = await http.get(url);
