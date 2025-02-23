@@ -7,7 +7,7 @@ const schema = 'https';
 // const host = '192.168.100.70';
 const host = 'rain-laundry.com';
 // const path = 'laravel-react-app/public/api';
-const path = 'laundry-back-end/public/api';
+const path = 'kitchen-laravel/public/api';
 
 getHeaders() async {
   final instance = await SharedPreferences.getInstance();

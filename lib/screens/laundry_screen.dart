@@ -8,7 +8,9 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/screens/laundry_screen.dart';
+import 'package:jawda/screens/login_screen.dart';
 import 'package:jawda/screens/pdf_veiwer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/finance_account.dart';
 import 'package:path_provider/path_provider.dart'; // Import path_provider
 import 'package:pdfrx/pdfrx.dart'; // Import pdfrx
@@ -115,10 +117,30 @@ final pathVariable =  _selectedBranch =='Branch One' ?  'kitchen-laravel/public/
     }
     return _pdfData;
   }
+    Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('auth_token'); // Remove the token
+
+    // Navigate back to the login screen
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginScreen()),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          //logout
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              // logout logic here
+              _logout(context);
+            },
+          ),
+        ],
         title: const Text('Reports'),
         backgroundColor: Colors.blue.shade300,
       ),
