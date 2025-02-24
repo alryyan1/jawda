@@ -25,7 +25,23 @@ class _MainScreenState extends State<MainScreen> {
   void initState() {
    
     super.initState();
+    _checkSession();
+
+  }
+  _checkSession() async{
+    final url = Uri(host: host,scheme: schema,path: path+'/user/');
+    var headers =  await getHeaders();
+     var response =  await http.get(url,headers: headers);
+     if (response.statusCode == 200) {
     _getDate();
+       
+     }else{
+      final shared =  await SharedPreferences.getInstance();
+      shared.remove('auth_token');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    
+     }
+    
   }
   Future<List<FinanceAccount>> _getDate() async {
     final url = Uri(scheme: schema, host: host, path: '$path/financeAccounts');

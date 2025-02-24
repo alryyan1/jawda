@@ -69,19 +69,7 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
     }
   }
 
-  String cleanBase64(String base64String) {
-    // Remove everything before the actual base64 data
-    RegExp exp = RegExp(r'base64,(.*)');
-    Match? match = exp.firstMatch(base64String);
 
-    if (match != null) {
-      return match.group(1)!.trim();
-    }
-
-    return base64String
-        .replaceAll(RegExp(r'\s+'), '') // Remove whitespaces & newlines
-        .trim();
-  }
 
   Future<Uint8List?> _generateAndShowPdf(int accountId) async {
     setState(() {

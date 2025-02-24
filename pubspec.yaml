@@ -50,7 +50,29 @@ dependencies:
   url_launcher: ^6.1.6
   pdfrx: ^1.1.11 # Use the specified version
   share_plus: ^10.1.4
+  badges: ^3.1.2
+  flutter_launcher_icons: ^0.14.3
 
+
+flutter_launcher_icons:
+  android: true # Enable icon generation for Android
+  ios: true     # Enable icon generation for iOS
+  image_path: "assets/logo.png" # Path to your icon image
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/logo.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/logo.png"
+    icon_size: 48 # optional, defaults to 48
+  macos:
+    generate: true
+    image_path: "assets/logo.png"
+    icon_size: 16 # optional, defaults to 16
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -60,20 +60,20 @@ class _AmountSummaryState extends State<AmountSummary> {
                       const SizedBox(height: 16),
                       _buildAmountRow(
                         'Bank Amount',
-                        NumberFormat('#,###.##', 'en_US').format(widget.bankAccount!.balance),
+                        NumberFormat('#,###.##', 'en_US').format(widget.bankAccount?.balance ?? 0),
                         colorScheme.primary,
                         icon: Icons.account_balance, // Add icon
                       ),
                       _buildAmountRow(
                         'Cash Amount',
-                        NumberFormat('#,###.##', 'en_US').format(widget.cashAccount!.balance),
+                        NumberFormat('#,###.##', 'en_US').format(widget.cashAccount?.balance ?? 0),
                         colorScheme.secondary,
                         icon: Icons.money, // Add icon
                       ),
                       const Divider(height: 24, thickness: 1),
                       _buildAmountRow(
                         'Total Amount',
-                        NumberFormat('#,###.##', 'en_US').format(widget.bankAccount!.balance + widget.cashAccount!.balance),
+                        NumberFormat('#,###.##', 'en_US').format((widget.bankAccount?.balance ?? 0 )+( widget.cashAccount?.balance ?? 0)),
                         colorScheme.tertiary,
                         isTotal: true,
                         icon: Icons.attach_money, // Add icon

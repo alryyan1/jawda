@@ -17,8 +17,8 @@ class Deduct {
   final double discount;
   final double paid;
   final int? doctorvisitId;
-  final String? endurancePercentage;
-  final String? userPaid;
+  final int? endurancePercentage;
+  final int? userPaid;
   final double totalPrice;
   final double profit;
   final double cost;
@@ -29,8 +29,10 @@ class Deduct {
   final List<DeductItem> deductedItems;
   final PaymentType paymentType;
   final User user;
-  final dynamic client; // You might want to create a Client model if the structure is known
-  final dynamic doctorvisit; // You might want to create a Doctorvisit model if the structure is known
+  final dynamic
+      client; // You might want to create a Client model if the structure is known
+  final dynamic
+      doctorvisit; // You might want to create a Doctorvisit model if the structure is known
 
   Deduct({
     required this.id,
@@ -83,12 +85,14 @@ class Deduct {
       updatedAt: DateTime.parse(json['updated_at'] as String),
       isPostpaid: json['is_postpaid'] as int,
       postpaidComplete: json['postpaid_complete'] as int,
-      postpaidDate: json['postpaid_date'] != null ? DateTime.parse(json['postpaid_date'] as String) : null,
+      postpaidDate: json['postpaid_date'] != null
+          ? DateTime.parse(json['postpaid_date'] as String)
+          : null,
       discount: (json['discount'] as num).toDouble(),
       paid: (json['paid'] as num).toDouble(),
       doctorvisitId: json['doctorvisit_id'] as int?,
-      endurancePercentage: json['endurance_percentage'] as String?,
-      userPaid: json['user_paid'] as String?,
+      endurancePercentage: json['endurance_percentage'] as int?,
+      userPaid: json['user_paid'],
       totalPrice: (json['total_price'] as num).toDouble(),
       profit: (json['profit'] as num).toDouble(),
       cost: (json['cost'] as num).toDouble(),
@@ -96,8 +100,11 @@ class Deduct {
       totalPaid: (json['total_paid'] as num).toDouble(),
       calculateTax: json['calculateTax'] as int,
       itemsConcatenated: json['itemsConcatenated'] as String,
-      deductedItems: (json['deducted_items'] as List<dynamic>).map((item) => DeductItem.fromJson(item as Map<String, dynamic>)).toList(),
-      paymentType: PaymentType.fromJson(json['payment_type'] as Map<String, dynamic>),
+      deductedItems: (json['deducted_items'] as List<dynamic>)
+          .map((item) => DeductItem.fromJson(item as Map<String, dynamic>))
+          .toList(),
+      paymentType:
+          PaymentType.fromJson(json['payment_type'] as Map<String, dynamic>),
       user: User.fromJson(json['user'] as Map<String, dynamic>),
       client: json['client'],
       doctorvisit: json['doctorvisit'],
@@ -118,7 +125,7 @@ class DeductItem {
   final DateTime createdAt;
   final DateTime updatedAt;
   final double discount;
-  final Item item;
+  final Item? item;
   final dynamic client;
 
   DeductItem({
@@ -152,7 +159,9 @@ class DeductItem {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       discount: (json['discount'] as num).toDouble(),
-      item: Item.fromJson(json['item'] as Map<String, dynamic>),
+      item: json['item'] != null
+          ? Item.fromJson(json['item'] as Map<String, dynamic>)
+          : null,
       client: json['client'],
     );
   }
@@ -171,11 +180,11 @@ class Item {
   final double sellPrice;
   final dynamic drugCategoryId;
   final dynamic pharmacyTypeId;
-  final String barcode;
+  final String? barcode;
   final int strips;
   final String scName;
   final String marketName;
-  final String batch;
+  final String? batch;
   final DateTime createdAt;
   final DateTime updatedAt;
   final String unit;
@@ -188,8 +197,8 @@ class Item {
   final dynamic section;
   final dynamic category;
   final dynamic type;
-  final DepositItem depositItem;
-
+  final DepositItem? depositItem;
+  final DateTime? depositExpire;
   Item({
     required this.id,
     this.sectionId,
@@ -220,6 +229,7 @@ class Item {
     this.section,
     this.category,
     this.type,
+    this.depositExpire,
     required this.depositItem,
   });
 
@@ -237,11 +247,11 @@ class Item {
       sellPrice: (json['sell_price'] as num).toDouble(),
       drugCategoryId: json['drug_category_id'],
       pharmacyTypeId: json['pharmacy_type_id'],
-      barcode: json['barcode'] as String,
+      barcode: json['barcode'] ,
       strips: json['strips'] as int,
       scName: json['sc_name'] as String,
       marketName: json['market_name'] as String,
-      batch: json['batch'] as String,
+      batch: json['batch'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       unit: json['unit'] as String,
@@ -250,11 +260,17 @@ class Item {
       active3: json['active3'] as String,
       packSize: json['pack_size'] as String,
       approvedRp: json['approved_rp'] as int,
-      lastDepositItem: json['lastDepositItem'] != null ? DepositItem.fromJson(json['lastDepositItem'] as Map<String, dynamic>) : null,
+      lastDepositItem: json['lastDepositItem'] != null
+          ? DepositItem.fromJson(
+              json['lastDepositItem'] as Map<String, dynamic>)
+          : null,
       section: json['section'],
       category: json['category'],
       type: json['type'],
-      depositItem: DepositItem.fromJson(json['deposit_item'] as Map<String, dynamic>),
+      depositItem: json['deposit_item'] != null
+          ? DepositItem.fromJson(json['deposit_item'] as Map<String, dynamic>)
+          : null,
+          depositExpire: json['deposit_expire']!=null ? DateTime.parse(json['deposit_expire']) : null,
     );
   }
 }
@@ -266,7 +282,7 @@ class DepositItem {
   final int quantity;
   final double cost;
   final String? batch;
-  final String expire;
+  final DateTime? expire;
   final String? notes;
   final String? barcode;
   final int returned;
@@ -279,7 +295,6 @@ class DepositItem {
   final int freeQuantity;
   final double finalSellPrice;
   final double finalCostPrice;
-  final Deposit deposit;
 
   DepositItem({
     required this.id,
@@ -301,7 +316,6 @@ class DepositItem {
     required this.freeQuantity,
     required this.finalSellPrice,
     required this.finalCostPrice,
-    required this.deposit,
   });
 
   factory DepositItem.fromJson(Map<String, dynamic> json) {
@@ -312,7 +326,7 @@ class DepositItem {
       quantity: json['quantity'] as int,
       cost: (json['cost'] as num).toDouble(),
       batch: json['batch'] as String?,
-      expire: json['expire'] as String,
+      expire: json['expire'] != null ? DateTime.parse(json['expire']) : null,
       notes: json['notes'] as String?,
       barcode: json['barcode'] as String?,
       returned: json['return'] as int,
@@ -325,7 +339,6 @@ class DepositItem {
       freeQuantity: json['free_quantity'] as int,
       finalSellPrice: (json['finalSellPrice'] as num).toDouble(),
       finalCostPrice: (json['finalCostPrice'] as num).toDouble(),
-      deposit: Deposit.fromJson(json['deposit'] as Map<String, dynamic>),
     );
   }
 }
@@ -471,7 +484,9 @@ class User {
       isAdmin: json['isAdmin'] as bool,
       isAccountant: json['isAccountant'] as bool,
       canPayLab: json['canPayLab'] as bool,
-      roles: (json['roles'] as List<dynamic>).map((item) => Role.fromJson(item as Map<String, dynamic>)).toList(),
+      roles: (json['roles'] as List<dynamic>)
+          .map((item) => Role.fromJson(item as Map<String, dynamic>))
+          .toList(),
       routes: json['routes'] as List<dynamic>,
       subRoutes: json['sub_routes'] as List<dynamic>,
       doctor: json['doctor'],
@@ -523,8 +538,12 @@ class PaymentType {
     return PaymentType(
       id: json['id'] as int,
       name: json['name'] as String,
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
+          : null,
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
     );
   }
 }

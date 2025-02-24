@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jawda/screens/pharmacy/report_by_shift.dart';
 import 'package:jawda/screens/pharmacy/sales_screen.dart';
 import 'near_expire_screen.dart';
 import 'inventory_screen.dart';
@@ -36,6 +37,12 @@ class PharmacyScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InventoryScreen()),
+              );
+            }),
+              _buildGridItem(context, 'Shifts', Icons.inventory, colorScheme.tertiary, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReportByShift()),
               );
             }),
           ],
