@@ -52,6 +52,8 @@ dependencies:
   share_plus: ^10.1.4
   badges: ^3.1.2
   flutter_launcher_icons: ^0.14.3
+  web_socket_channel: ^3.0.2
+  socket_io_client: ^3.0.2
 
 
 flutter_launcher_icons:

@@ -68,14 +68,12 @@ class _MyPdfViewerState extends State<MyPdfViewer> {
         ],
       ),
       body: Container(
-        child: Expanded(
-          child: (widget.pdfData != null)
-              ? PdfViewer.data(
-                  sourceName: widget.id,
-                  widget.pdfData!,
-                )
-              : Center(child: Text('No PDF data available')), // Handle null PDF data
-        ),
+        child: (widget.pdfData != null)
+            ? PdfViewer.data(
+                sourceName: widget.id,
+                widget.pdfData!,
+              )
+            : Center(child: Text('No PDF data available')),
       ),
     );
   }

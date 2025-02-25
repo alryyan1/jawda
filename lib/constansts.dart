@@ -14,6 +14,7 @@ import 'package:pdfrx/pdfrx.dart'; // Import pdfrx
 
 const schema = 'http';
 // const host = 'alroomy.a.pinggy.link';
+// const host = 'altohami.a.pinggy.link';
 const host = '192.168.100.70';
 // const host = '192.168.137.1';
 const path = 'laravel-react-app/public/api';
@@ -41,12 +42,10 @@ String cleanBase64(String base64String) {
       .trim();
 }
 
-Future<Uint8List?> generateAndShowPdf(String api ,BuildContext context,Map<String,String> query) async {
-  final url = Uri(
-      scheme: schema,
-      host: host,
-      path: path + api,
-      queryParameters: query);
+Future<Uint8List?> generateAndShowPdf(
+    String api, BuildContext context, Map<String, String> query) async {
+  final url =
+      Uri(scheme: schema, host: host, path: path + api, queryParameters: query);
 
   try {
     final response = await http.get(url);
@@ -66,5 +65,47 @@ Future<Uint8List?> generateAndShowPdf(String api ,BuildContext context,Map<Strin
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('An error occurred while generating PDF')),
     );
+  }
+}
+
+
+
+Future<T> axios<T>(
+  String api,
+  Map<String, String> queryParameters,
+  T Function(Map<String, dynamic>) fromJson, // Factory for single object
+ String? key 
+) async {
+  final headers = await getHeaders();
+
+  var url = Uri(
+    scheme: schema,
+    path: path + '/' + api,
+    host: host,
+    queryParameters: queryParameters,
+  );
+
+  var response = await http.get(url, headers: headers);
+
+  if (response.statusCode == 200) {
+    var jsonResponse = jsonDecode(response.body);
+
+    if (jsonResponse is List) {
+      return jsonResponse.map((item) => fromJson(item)).toList() as T;
+    } else {
+      if(key != null){
+
+      return fromJson(jsonResponse[key]) as T;
+      }else{
+        return fromJson(jsonResponse) as T;
+      }
+    }
+  }
+
+  if (response.statusCode == 404 || response.statusCode == 411) {
+    var jsonResponse = jsonDecode(response.body);
+    throw Exception(jsonResponse['message']);
+  } else {
+    throw Exception('Error fetching data from API');
   }
 }

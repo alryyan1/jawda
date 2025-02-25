@@ -54,7 +54,7 @@ class Shift {
       touched: json['touched'] == 1,
     );
   }
-    static Future<Shift> getShiftById(int id) async {
+    static Future<Shift> getShiftById([int? id] ) async {
     try {
       Uri url =
           Uri(scheme: schema, host: host, path: path + '/shiftById/${id}',queryParameters: {

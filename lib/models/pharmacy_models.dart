@@ -68,7 +68,42 @@ class Deduct {
     this.client,
     this.doctorvisit,
   });
-
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'shift_id': shiftId,
+      'user_id': userId,
+      'payment_type_id': paymentTypeId,
+      'complete': complete,
+      'total_amount_received': totalAmountReceived,
+      'number': number,
+      'notes': notes,
+      'is_sell': isSell,
+      'client_id': clientId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'is_postpaid': isPostpaid,
+      'postpaid_complete': postpaidComplete,
+      'postpaid_date': postpaidDate?.toIso8601String(),
+      'discount': discount,
+      'paid': paid,
+      'doctorvisit_id': doctorvisitId,
+      'endurance_percentage': endurancePercentage,
+      'user_paid': userPaid,
+      'total_price': totalPrice,
+      'profit': profit,
+      'cost': cost,
+      'total_price_unpaid': totalPriceUnpaid,
+      'total_paid': totalPaid,
+      'calculateTax': calculateTax,
+      'itemsConcatenated': itemsConcatenated,
+      'deducted_items': deductedItems.map((item) => item.toJson()).toList(),
+      'payment_type': paymentType.toJson(),
+      'user': user.toJson(),
+      'client': client,
+      'doctorvisit': doctorvisit,
+    };
+  }
   factory Deduct.fromJson(Map<String, dynamic> json) {
     return Deduct(
       id: json['id'] as int,
@@ -144,7 +179,24 @@ class DeductItem {
     required this.item,
     this.client,
   });
-
+ Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'shift_id': shiftId,
+      'user_id': userId,
+      'deduct_id': deductId,
+      'item_id': itemId,
+      'client_id': clientId,
+      'strips': strips,
+      'box': box,
+      'price': price,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'discount': discount,
+      'item': item?.toJson(), // Handle nullable Item
+      'client': client,
+    };
+  }
   factory DeductItem.fromJson(Map<String, dynamic> json) {
     return DeductItem(
       id: json['id'] as int,
@@ -232,7 +284,41 @@ class Item {
     this.depositExpire,
     required this.depositItem,
   });
-
+ Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'section_id': sectionId,
+      'name': name,
+      'require_amount': requireAmount,
+      'initial_balance': initialBalance,
+      'initial_price': initialPrice,
+      'tests': tests,
+      'expire': expire,
+      'cost_price': costPrice,
+      'sell_price': sellPrice,
+      'drug_category_id': drugCategoryId,
+      'pharmacy_type_id': pharmacyTypeId,
+      'barcode': barcode,
+      'strips': strips,
+      'sc_name': scName,
+      'market_name': marketName,
+      'batch': batch,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'unit': unit,
+      'active1': active1,
+      'active2': active2,
+      'active3': active3,
+      'pack_size': packSize,
+      'approved_rp': approvedRp,
+      'lastDepositItem': lastDepositItem?.toJson(),
+      'section': section,
+      'category': category,
+      'type': type,
+        'deposit_expire': depositExpire?.toIso8601String(),
+      'deposit_item': depositItem?.toJson(),
+    };
+  }
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json['id'] as int,
@@ -295,7 +381,29 @@ class DepositItem {
   final int freeQuantity;
   final double finalSellPrice;
   final double finalCostPrice;
-
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'item_id': itemId,
+      'deposit_id': depositId,
+      'quantity': quantity,
+      'cost': cost,
+      'batch': batch,
+      'expire': expire?.toIso8601String(),
+      'notes': notes,
+      'barcode': barcode,
+      'return': returned,
+      'user_id': userId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'sell_price': sellPrice,
+      'vat_cost': vatCost,
+      'vat_sell': vatSell,
+      'free_quantity': freeQuantity,
+      'finalSellPrice': finalSellPrice,
+      'finalCostPrice': finalCostPrice,
+    };
+  }
   DepositItem({
     required this.id,
     required this.itemId,
@@ -381,7 +489,28 @@ class Deposit {
     required this.supplier,
     required this.user,
   });
-
+  
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'supplier_id': supplierId,
+      'bill_number': billNumber,
+      'bill_date': billDate,
+      'complete': complete,
+      'paid': paid,
+      'user_id': userId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'payment_method': paymentMethod,
+      'discount': discount,
+      'vat_sell': vatSell,
+      'vat_cost': vatCost,
+      'is_locked': isLocked,
+      'showAll': showAll,
+      'supplier': supplier.toJson(),
+      'user': user.toJson(),
+    };
+  }
   factory Deposit.fromJson(Map<String, dynamic> json) {
     return Deposit(
       id: json['id'] as int,
@@ -423,7 +552,17 @@ class Supplier {
     required this.createdAt,
     required this.updatedAt,
   });
-
+   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'phone': phone,
+      'address': address,
+      'email': email,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
   factory Supplier.fromJson(Map<String, dynamic> json) {
     return Supplier(
       id: json['id'] as int,
@@ -471,7 +610,25 @@ class User {
     this.doctor,
     required this.permissions,
   });
-
+ Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'doctor_id': doctorId,
+      'is_nurse': isNurse,
+      'name': name,
+      'isAdmin': isAdmin,
+      'isAccountant': isAccountant,
+      'canPayLab': canPayLab,
+      // 'roles': roles.map((role) => role.toJson()).toList(),
+      'routes': routes,
+      'sub_routes': subRoutes,
+      'doctor': doctor,
+      'permissions': permissions,
+    };
+  }
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as int,
@@ -534,6 +691,14 @@ class PaymentType {
     this.updatedAt,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
+    };
+  }
   factory PaymentType.fromJson(Map<String, dynamic> json) {
     return PaymentType(
       id: json['id'] as int,

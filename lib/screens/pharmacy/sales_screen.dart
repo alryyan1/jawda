@@ -22,7 +22,7 @@ class _SaledateinfoListState extends State<SaledateinfoList> {
   Future<void> _loadData() async {
     setState(() {
       _isLoading = true;
-      _errorMessage = null;
+      _errorMessage = null; 
     });
     try {
       _data = await Saledateinfo.getData();

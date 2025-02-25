@@ -55,8 +55,8 @@ class _MainScreenState extends State<MainScreen> {
         List<FinanceAccount> financeAccounts =
             data.map((fjson) => FinanceAccount.fromJson(fjson)).toList();
 
-        widget.bankAccount = financeAccounts.firstWhere((a) => a.id == 2);
-        widget.cashAccount = financeAccounts.firstWhere((a) => a.id == 3);
+        widget.bankAccount = financeAccounts.firstWhere((a) => a.id == 16);
+        widget.cashAccount = financeAccounts.firstWhere((a) => a.id == 5);
 
         return financeAccounts;
       }
