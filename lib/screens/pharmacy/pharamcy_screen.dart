@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jawda/screens/pharmacy/clients.dart';
 import 'package:jawda/screens/pharmacy/pos.dart';
 import 'package:jawda/screens/pharmacy/report_by_shift.dart';
 import 'package:jawda/screens/pharmacy/sales_screen.dart';
@@ -50,6 +51,12 @@ class PharmacyScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Pos()),
+              );
+            }),
+            _buildGridItem(context, 'Clients', Icons.person, colorScheme.tertiary, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Clients()),
               );
             }),
           ],

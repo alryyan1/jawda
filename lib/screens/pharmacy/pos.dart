@@ -6,6 +6,7 @@ import 'package:jawda/models/shift.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:http/http.dart' as http;
 import 'package:jawda/providers/shift_provider.dart';
+import 'package:jawda/screens/pharmacy/AddItemsToDeductScreen.dart';
 import 'package:provider/provider.dart';
 
 class Pos extends StatefulWidget {
@@ -90,30 +91,39 @@ class _PosState extends State<Pos> {
                         final deduct = shift.deducts[index];
                         return LayoutBuilder(
                           builder: (context, constraints) {
-                            return badges.Badge(
-                              position:
-                                  badges.BadgePosition.topEnd(top: 0, end: 0),
-                              badgeContent: Text(
-                                '${deduct.deductedItems.length}', // Display item index as badge content
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 10),
-                              ),
-                              badgeStyle: badges.BadgeStyle(
-                                  badgeColor:
-                                      Colors.pink), // Set badge color to pink
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color:
-                                      Colors.grey[200], // Light grey background
-                                  borderRadius: BorderRadius.circular(
-                                      15), // Rounded corners
+                            return InkWell(
+                              onTap: () {
+                                context.read<ShiftProvider>().setSelectedDeduct = deduct;
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                  return AddItemsToDeductScreen(deduct: deduct);
+                                },));
+                              },
+                              child: badges.Badge(
+                                position:
+                                    badges.BadgePosition.topEnd(top: 0, end: 0),
+                                badgeContent: Text(
+                                  '${deduct.deductedItems.length}', // Display item index as badge content
+                                  style:
+                                      TextStyle(color: Colors.white, fontSize: 10),
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    deduct.number.toString(),
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
+                                badgeStyle: badges.BadgeStyle(
+                                    badgeColor:
+                                        Colors.pink), // Set badge color to pink
+                                child: Container(
+                                  
+                                  decoration: BoxDecoration(
+                                    color:
+                                        deduct.complete == 1 ? Colors.green : Colors.grey[200], // Light grey background
+                                    borderRadius: BorderRadius.circular(
+                                        15), // Rounded corners
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      deduct.number.toString(),
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ),
                               ),

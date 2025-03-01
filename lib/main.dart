@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/models/doctor.dart';
+import 'package:jawda/providers/client_provider.dart';
+import 'package:jawda/providers/item_provider.dart';
 import 'package:jawda/providers/shift_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -16,7 +18,7 @@ void main() async {
   final authToken = prefs.getString('auth_token');
  // Dart client
 
-     IO.Socket  _socket = IO.io('http://192.168.100.70:3000', <String, dynamic>{
+     IO.Socket  _socket = IO.io('http://192.168.137.1:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
@@ -35,6 +37,10 @@ void main() async {
   runApp(
     MultiProvider(
        providers: [
+        ChangeNotifierProvider(create:  (context) {
+          return ClientProvider();
+        },),
+        ChangeNotifierProvider(create: (context)=> ItemProvider()),
         ChangeNotifierProvider(create: (context)=> DoctorProvider()),
         ChangeNotifierProvider(create: (context){
 

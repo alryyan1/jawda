@@ -1,3 +1,9 @@
+import 'dart:convert';
+
+import 'package:jawda/constansts.dart';
+import 'package:jawda/models/client.dart';
+import 'package:jawda/services/dio_client.dart';
+
 class Deduct {
   final int id;
   final int shiftId;
@@ -29,7 +35,7 @@ class Deduct {
   final List<DeductItem> deductedItems;
   final PaymentType paymentType;
   final User user;
-  final dynamic
+  final Client?
       client; // You might want to create a Client model if the structure is known
   final dynamic
       doctorvisit; // You might want to create a Doctorvisit model if the structure is known
@@ -104,6 +110,7 @@ class Deduct {
       'doctorvisit': doctorvisit,
     };
   }
+
   factory Deduct.fromJson(Map<String, dynamic> json) {
     return Deduct(
       id: json['id'] as int,
@@ -141,10 +148,11 @@ class Deduct {
       paymentType:
           PaymentType.fromJson(json['payment_type'] as Map<String, dynamic>),
       user: User.fromJson(json['user'] as Map<String, dynamic>),
-      client: json['client'],
+      client: json['client']!=null ? Client.fromJson(json['client']) :null ,
       doctorvisit: json['doctorvisit'],
     );
   }
+
 }
 
 class DeductItem {
@@ -179,7 +187,7 @@ class DeductItem {
     required this.item,
     this.client,
   });
- Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'shift_id': shiftId,
@@ -197,6 +205,7 @@ class DeductItem {
       'client': client,
     };
   }
+
   factory DeductItem.fromJson(Map<String, dynamic> json) {
     return DeductItem(
       id: json['id'] as int,
@@ -284,7 +293,7 @@ class Item {
     this.depositExpire,
     required this.depositItem,
   });
- Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'section_id': sectionId,
@@ -315,10 +324,11 @@ class Item {
       'section': section,
       'category': category,
       'type': type,
-        'deposit_expire': depositExpire?.toIso8601String(),
+      'deposit_expire': depositExpire?.toIso8601String(),
       'deposit_item': depositItem?.toJson(),
     };
   }
+
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       id: json['id'] as int,
@@ -333,7 +343,7 @@ class Item {
       sellPrice: (json['sell_price'] as num).toDouble(),
       drugCategoryId: json['drug_category_id'],
       pharmacyTypeId: json['pharmacy_type_id'],
-      barcode: json['barcode'] ,
+      barcode: json['barcode'],
       strips: json['strips'] as int,
       scName: json['sc_name'] as String,
       marketName: json['market_name'] as String,
@@ -356,7 +366,9 @@ class Item {
       depositItem: json['deposit_item'] != null
           ? DepositItem.fromJson(json['deposit_item'] as Map<String, dynamic>)
           : null,
-          depositExpire: json['deposit_expire']!=null ? DateTime.parse(json['deposit_expire']) : null,
+      depositExpire: json['deposit_expire'] != null
+          ? DateTime.parse(json['deposit_expire'])
+          : null,
     );
   }
 }
@@ -404,6 +416,7 @@ class DepositItem {
       'finalCostPrice': finalCostPrice,
     };
   }
+
   DepositItem({
     required this.id,
     required this.itemId,
@@ -489,7 +502,7 @@ class Deposit {
     required this.supplier,
     required this.user,
   });
-  
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -511,6 +524,7 @@ class Deposit {
       'user': user.toJson(),
     };
   }
+
   factory Deposit.fromJson(Map<String, dynamic> json) {
     return Deposit(
       id: json['id'] as int,
@@ -552,7 +566,7 @@ class Supplier {
     required this.createdAt,
     required this.updatedAt,
   });
-   Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
@@ -563,6 +577,7 @@ class Supplier {
       'updated_at': updatedAt.toIso8601String(),
     };
   }
+
   factory Supplier.fromJson(Map<String, dynamic> json) {
     return Supplier(
       id: json['id'] as int,
@@ -610,7 +625,7 @@ class User {
     this.doctor,
     required this.permissions,
   });
- Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'username': username,
@@ -629,6 +644,7 @@ class User {
       'permissions': permissions,
     };
   }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as int,
@@ -699,6 +715,7 @@ class PaymentType {
       'updated_at': updatedAt?.toIso8601String(),
     };
   }
+
   factory PaymentType.fromJson(Map<String, dynamic> json) {
     return PaymentType(
       id: json['id'] as int,
