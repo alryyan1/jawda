@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
     var headers =  await getHeaders();
      var response =  await http.get(url,headers: headers);
      if (response.statusCode == 200) {
-    _getDate();
+    // _getDate();
        
      }else{
       final shared =  await SharedPreferences.getInstance();
@@ -55,8 +55,8 @@ class _MainScreenState extends State<MainScreen> {
         List<FinanceAccount> financeAccounts =
             data.map((fjson) => FinanceAccount.fromJson(fjson)).toList();
 
-        widget.bankAccount = financeAccounts.firstWhere((a) => a.id == 16);
-        widget.cashAccount = financeAccounts.firstWhere((a) => a.id == 5);
+        widget.bankAccount = financeAccounts.firstWhere((a) => a.id == 1);
+        widget.cashAccount = financeAccounts.firstWhere((a) => a.id == 1);
 
         return financeAccounts;
       }
@@ -106,7 +106,7 @@ class _MainScreenState extends State<MainScreen> {
         child: ListView(
           // Use ListView to make the whole screen scrollable
           children: [
-             _isLoading ? Center(child: CircularProgressIndicator(),) : AmountSummary(bankAccount: widget.bankAccount, cashAccount: widget.cashAccount),
+            //  _isLoading ? Center(child: CircularProgressIndicator(),) : AmountSummary(bankAccount: widget.bankAccount, cashAccount: widget.cashAccount),
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.count(

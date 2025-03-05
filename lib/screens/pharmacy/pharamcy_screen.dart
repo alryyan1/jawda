@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:jawda/screens/pharmacy/clients.dart';
+import 'package:jawda/screens/pharmacy/items_screen.dart';
 import 'package:jawda/screens/pharmacy/pos.dart';
+import 'package:jawda/screens/pharmacy/purchases_screen.dart';
 import 'package:jawda/screens/pharmacy/report_by_shift.dart';
 import 'package:jawda/screens/pharmacy/sales_screen.dart';
 import 'near_expire_screen.dart';
@@ -23,40 +25,63 @@ class PharmacyScreen extends StatelessWidget {
           crossAxisSpacing: 16.0,
           mainAxisSpacing: 16.0,
           children: [
-            _buildGridItem(context, 'Sales', Icons.monetization_on, colorScheme.primary, () {
+            _buildGridItem(
+                context, 'Sales', Icons.monetization_on, colorScheme.primary,
+                () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SaledateinfoList()),
               );
             }),
-            _buildGridItem(context, 'Near Expire', Icons.warning, colorScheme.secondary, () {
+            _buildGridItem(
+                context, 'Near Expire', Icons.warning, colorScheme.secondary,
+                () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NearExpireScreen()),
               );
             }),
-            _buildGridItem(context, 'Inventory', Icons.inventory, colorScheme.tertiary, () {
+            _buildGridItem(
+                context, 'Inventory', Icons.inventory, colorScheme.tertiary,
+                () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => InventoryScreen()),
               );
             }),
-              _buildGridItem(context, 'Shifts', Icons.inventory, colorScheme.tertiary, () {
+            _buildGridItem(
+                context, 'Shifts', Icons.inventory, colorScheme.tertiary, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => ReportByShift()),
               );
             }),
-              _buildGridItem(context, 'POS', Icons.shopping_cart, colorScheme.tertiary, () {
+            _buildGridItem(
+                context, 'POS', Icons.shopping_cart, colorScheme.tertiary, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Pos()),
               );
             }),
-            _buildGridItem(context, 'Clients', Icons.person, colorScheme.tertiary, () {
+            _buildGridItem(
+                context, 'Clients', Icons.person, colorScheme.tertiary, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Clients()),
+              );
+            }),
+            _buildGridItem(
+                context, 'Items', Icons.add_box, colorScheme.tertiary, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ItemsScreen()),
+              );
+            }),
+              _buildGridItem(
+                context, 'Purchases', Icons.add_box, colorScheme.tertiary, () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PurchasesScreen()),
               );
             }),
           ],
@@ -65,7 +90,8 @@ class PharmacyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(BuildContext context, String title, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildGridItem(BuildContext context, String title, IconData icon,
+      Color color, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       child: Container(

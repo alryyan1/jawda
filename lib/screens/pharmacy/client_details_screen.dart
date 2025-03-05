@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; // Import intl for number formatting
-import 'package:jawda/models/client.dart'; // Import Client model
+import 'package:jawda/models/client.dart';
+import 'package:jawda/screens/pharmacy/client_purchases_screen.dart'; // Import Client model
 
 class ClientDetailsScreen extends StatefulWidget {
   final Client client;
@@ -138,6 +139,9 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                        return ClientPurchases(client:  widget.client);
+                    },));
                     
                   }, icon: Icon(Icons.remove_red_eye))
                 ],

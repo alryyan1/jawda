@@ -15,7 +15,7 @@ class ErrorInterceptor extends Interceptor {
       SnackBar(
         content: Text(errorMessage),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+        duration: Duration(seconds: 13),
       ),
     );
 
@@ -37,7 +37,7 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.cancel:
         return "Request was cancelled.";
       case DioExceptionType.connectionError:
-        return "No internet connection.";
+        return "No internet connection.";      
       case DioExceptionType.unknown:
       default:
         return "An unexpected error occurred.";

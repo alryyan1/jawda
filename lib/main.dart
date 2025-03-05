@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/models/doctor.dart';
 import 'package:jawda/providers/client_provider.dart';
+import 'package:jawda/providers/deposit_provider.dart';
 import 'package:jawda/providers/item_provider.dart';
 import 'package:jawda/providers/shift_provider.dart';
+import 'package:jawda/providers/socket_provider.dart';
+import 'package:jawda/providers/supplier_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'providers/doctor_provider.dart';
@@ -40,13 +43,17 @@ void main() async {
         ChangeNotifierProvider(create:  (context) {
           return ClientProvider();
         },),
+        ChangeNotifierProvider(create: (context)=> SupplierProvider()),
+        ChangeNotifierProvider(create: (context)=> DepositProvider()),
         ChangeNotifierProvider(create: (context)=> ItemProvider()),
         ChangeNotifierProvider(create: (context)=> DoctorProvider()),
         ChangeNotifierProvider(create: (context){
-
-          final shiftProvider = ShiftProvider();
-          shiftProvider.connectSocket();
-          return shiftProvider;
+          final socketProvider = SocketProvider();
+          socketProvider.connectSocket();
+          return socketProvider;
+        }),
+        ChangeNotifierProvider(create: (context){
+          return ShiftProvider();
         })
          
        ],

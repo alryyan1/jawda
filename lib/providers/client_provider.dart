@@ -15,7 +15,7 @@ Future<void> addClient(Client client,BuildContext context) async {
       final dio = DioClient.getDioInstance(context);
 
       final response = await dio.post(
-        '/clients', // Assuming the endpoint for creating clients is /clients
+        'client/create', // Assuming the endpoint for creating clients is /clients
         data: client.toJson(), // Pass the client data as JSON
       
       );
@@ -38,7 +38,7 @@ Future<void> addClient(Client client,BuildContext context) async {
   Future<Client> getClient(int id,context)async {
     try {
       final dio = DioClient.getDioInstance(context);
-      final response =  await dio.get('client/${id}',queryParameters: {'load':'dudcuts'});
+      final response =  await dio.get('client/$id');
       final clientAsJson =  response.data;
       return Client.fromJson(clientAsJson);
     } catch (e) {

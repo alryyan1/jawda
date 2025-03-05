@@ -5,14 +5,12 @@ import 'package:jawda/constansts.dart';
 import 'package:jawda/models/Shift.dart';
 import 'package:jawda/models/pharmacy_models.dart';
 import 'package:jawda/services/dio_client.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ShiftProvider with ChangeNotifier {
   Shift? _shift;
   Deduct? _selectedDedduct;
   String? _errorMessage;
   bool _isLoading = false;
-  IO.Socket? _socket; // Socket Instance
 
   get isLoading => _isLoading;
   Shift? get shift => _shift;
@@ -20,17 +18,21 @@ class ShiftProvider with ChangeNotifier {
   //set
   set setSelectedDeduct(Deduct value){
       _selectedDedduct = value;
-      notifyListeners();
+      // notifyListeners();
   
   }
   get errorMessage => _errorMessage;
-  IO.Socket? get socket => _socket; // Socket Instance
   Future<void> fetchShift([int? id]) async {
     _isLoading = true;
     _errorMessage = null;
     try {
       _shift = await Shift.getShiftById(id);
-    } catch (e) {
+    } 
+    on TypeError catch(e){
+      _errorMessage = "Error $e  at ${e.stackTrace}";
+
+    }
+    catch (e) {
       _errorMessage = "Error $e";
     } finally {
       _isLoading = false;
@@ -38,7 +40,7 @@ class ShiftProvider with ChangeNotifier {
     }
   }
 
-  saveDeductItems(List<Item> items, Deduct deduct,BuildContext context) async {
+ Future<Deduct?> saveDeductItems(List<Item> items, Deduct deduct,BuildContext context) async {
     try {
       _isLoading = true;
       _errorMessage = null;
@@ -62,8 +64,8 @@ class ShiftProvider with ChangeNotifier {
         } else {
           print('deduct not found');
         }
-
-        sendMessage('update deduct', jsonEncode(_selectedDedduct!.toJson()));
+    return _selectedDedduct;
+        // sendMessage('update deduct', jsonEncode(_selectedDedduct!.toJson()));
       } else {
         print('Error saving items');
       }
@@ -80,10 +82,12 @@ class ShiftProvider with ChangeNotifier {
     int indexOf = shift!.deducts.indexWhere((d) => d.id == deductObj.id);
     if (indexOf != -1) {
       shift!.deducts[indexOf] = deductObj;
+      _selectedDedduct = deductObj;
+      notifyListeners();
     } else {
       print('deduct not found');
     }
-    sendMessage('update deduct', jsonEncode(deduct));
+    // sendMessage('update deduct', jsonEncode(deduct));
     notifyListeners();
   }
 
@@ -95,9 +99,13 @@ class ShiftProvider with ChangeNotifier {
        _selectedDedduct = await axios<Deduct>(
           'inventory/deduct/new', {'is_sell': "1"}, Deduct.fromJson, 'data');
       _shift!.deducts.insert(0, _selectedDedduct!);
-      sendMessage('new deduct', jsonEncode(_selectedDedduct!.toJson()));
+      // sendMessage('new deduct', jsonEncode(_selectedDedduct!.toJson()));
       notifyListeners();
-    } catch (e) {
+    } 
+    on TypeError catch(e){
+      _errorMessage = "Error $e  at ${e.stackTrace}";
+    }
+    catch (e) {
       throw Exception(e);
     } finally {
       //  print(object)
@@ -106,7 +114,7 @@ class ShiftProvider with ChangeNotifier {
     }
   }
 
- deleteDeductItem( DeductItem deductItem,BuildContext context) async {
+ Future<Deduct?> deleteDeductItem( DeductItem deductItem,BuildContext context) async {
     try {
       _isLoading = true;
       _errorMessage = null;
@@ -127,8 +135,9 @@ class ShiftProvider with ChangeNotifier {
         } else {
           print('deduct not found');
         }
+        return _selectedDedduct;
 
-        sendMessage('update deduct', jsonEncode(_selectedDedduct!.toJson()));
+        // sendMessage('update deduct', jsonEncode(_selectedDedduct!.toJson()));
       } else {
         print('Error saving items');
       }
@@ -140,46 +149,4 @@ class ShiftProvider with ChangeNotifier {
     }
   }
 
-
-  Future<void> connectSocket() async {
-    try {
-      _socket = IO.io('http://${host}:3000', <String, dynamic>{
-        'transports': ['websocket'],
-        'autoConnect': true,
-      });
-
-      _socket!.onConnect((_) {
-        print('Connected to Socket.IO server');
-        _socket!.emit('msg', 'Flutter app connected');
-      });
-
-      _socket!.on('chat message', (data) {
-        print('Received message: $data');
-        notifyListeners();
-      });
-
-      _socket!.onDisconnect((_) => print('Disconnected'));
-      _socket!.onError((err) => print(err));
-      notifyListeners();
-    } catch (e) {
-      print('Error connecting to Socket.IO server: $e');
-    }
-  }
-
-  void disconnectSocket() {
-    if (_socket != null) {
-      _socket!.disconnect();
-      _socket!.dispose();
-      _socket = null;
-      notifyListeners();
-    }
-  }
-
-  void sendMessage(String event, dynamic data) {
-    if (_socket != null && _socket!.connected) {
-      _socket!.emit(event, data);
-    } else {
-      print('Socket not connected or initialized');
-    }
-  }
 }

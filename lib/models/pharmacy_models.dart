@@ -8,7 +8,6 @@ class Deduct {
   final int id;
   final int shiftId;
   final int userId;
-  final int paymentTypeId;
   final int complete;
   final double totalAmountReceived;
   final int number;
@@ -25,16 +24,15 @@ class Deduct {
   final int? doctorvisitId;
   final int? endurancePercentage;
   final int? userPaid;
-  final double totalPrice;
-  final double profit;
-  final double cost;
-  final double totalPriceUnpaid;
-  final double totalPaid;
-  final int calculateTax;
-  final String itemsConcatenated;
+  final double? totalPrice;
+  final double? profit;
+  final double? cost;
+  final double? totalPriceUnpaid;
+  final double? totalPaid;
+  final int? calculateTax;
+  final String? itemsConcatenated;
   final List<DeductItem> deductedItems;
-  final PaymentType paymentType;
-  final User user;
+  final User? user;
   final Client?
       client; // You might want to create a Client model if the structure is known
   final dynamic
@@ -44,7 +42,6 @@ class Deduct {
     required this.id,
     required this.shiftId,
     required this.userId,
-    required this.paymentTypeId,
     required this.complete,
     required this.totalAmountReceived,
     required this.number,
@@ -69,7 +66,6 @@ class Deduct {
     required this.calculateTax,
     required this.itemsConcatenated,
     required this.deductedItems,
-    required this.paymentType,
     required this.user,
     this.client,
     this.doctorvisit,
@@ -79,7 +75,6 @@ class Deduct {
       'id': id,
       'shift_id': shiftId,
       'user_id': userId,
-      'payment_type_id': paymentTypeId,
       'complete': complete,
       'total_amount_received': totalAmountReceived,
       'number': number,
@@ -104,8 +99,7 @@ class Deduct {
       'calculateTax': calculateTax,
       'itemsConcatenated': itemsConcatenated,
       'deducted_items': deductedItems.map((item) => item.toJson()).toList(),
-      'payment_type': paymentType.toJson(),
-      'user': user.toJson(),
+      'user': user?.toJson(),
       'client': client,
       'doctorvisit': doctorvisit,
     };
@@ -116,7 +110,6 @@ class Deduct {
       id: json['id'] as int,
       shiftId: json['shift_id'] as int,
       userId: json['user_id'] as int,
-      paymentTypeId: json['payment_type_id'] as int,
       complete: json['complete'] as int,
       totalAmountReceived: (json['total_amount_received'] as num).toDouble(),
       number: json['number'] as int,
@@ -135,19 +128,18 @@ class Deduct {
       doctorvisitId: json['doctorvisit_id'] as int?,
       endurancePercentage: json['endurance_percentage'] as int?,
       userPaid: json['user_paid'],
-      totalPrice: (json['total_price'] as num).toDouble(),
-      profit: (json['profit'] as num).toDouble(),
-      cost: (json['cost'] as num).toDouble(),
-      totalPriceUnpaid: (json['total_price_unpaid'] as num).toDouble(),
-      totalPaid: (json['total_paid'] as num).toDouble(),
-      calculateTax: json['calculateTax'] as int,
-      itemsConcatenated: json['itemsConcatenated'] as String,
+      totalPrice: (json['total_price'] as num?)?.toDouble() ,
+      profit: (json['profit'] as num?)?.toDouble(),
+      cost: (json['cost'] as num?)?.toDouble(),
+      totalPriceUnpaid: (json['total_price_unpaid'] as num?)?.toDouble(),
+      totalPaid: (json['total_paid'] as num?)?.toDouble(),
+      calculateTax: json['calculateTax'] as int? ,
+      itemsConcatenated: json['itemsConcatenated'] as String?,
       deductedItems: (json['deducted_items'] as List<dynamic>)
           .map((item) => DeductItem.fromJson(item as Map<String, dynamic>))
           .toList(),
-      paymentType:
-          PaymentType.fromJson(json['payment_type'] as Map<String, dynamic>),
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+  
+      user: json['user']!= null ? User.fromJson(json['user'] as Map<String, dynamic>) :null,
       client: json['client']!=null ? Client.fromJson(json['client']) :null ,
       doctorvisit: json['doctorvisit'],
     );
@@ -227,7 +219,59 @@ class DeductItem {
     );
   }
 }
+class Category {
+  final int id;
+  final String name;
 
+  Category({
+    required this.id,
+    required this.name,
+  });
+
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      id: json['id'] as int,
+      name: json['name'] as String,
+    );
+  }
+    Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
+  }
+}
+
+class Type {
+  final int id;
+  final String name;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  Type({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Type.fromJson(Map<String, dynamic> json) {
+    return Type(
+      id: json['id'] as int,
+      name: json['name'] as String,
+      createdAt: DateTime.parse(json['created_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String),
+    );
+  }
+   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+       'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+}
 class Item {
   final int id;
   final int? sectionId;
@@ -256,8 +300,8 @@ class Item {
   final int approvedRp;
   final DepositItem? lastDepositItem;
   final dynamic section;
-  final dynamic category;
-  final dynamic type;
+  final Category? category;
+  final Type? type;
   final DepositItem? depositItem;
   final DateTime? depositExpire;
   Item({
@@ -322,8 +366,8 @@ class Item {
       'approved_rp': approvedRp,
       'lastDepositItem': lastDepositItem?.toJson(),
       'section': section,
-      'category': category,
-      'type': type,
+      'category': category?.toJson(),
+      'type': type?.toJson(),
       'deposit_expire': depositExpire?.toIso8601String(),
       'deposit_item': depositItem?.toJson(),
     };
@@ -356,19 +400,19 @@ class Item {
       active3: json['active3'] as String,
       packSize: json['pack_size'] as String,
       approvedRp: json['approved_rp'] as int,
-      lastDepositItem: json['lastDepositItem'] != null
+      lastDepositItem: json['last_deposit_item'] != null
           ? DepositItem.fromJson(
-              json['lastDepositItem'] as Map<String, dynamic>)
+              json['last_deposit_item'] as Map<String, dynamic>)
           : null,
       section: json['section'],
-      category: json['category'],
-      type: json['type'],
       depositItem: json['deposit_item'] != null
           ? DepositItem.fromJson(json['deposit_item'] as Map<String, dynamic>)
           : null,
       depositExpire: json['deposit_expire'] != null
           ? DateTime.parse(json['deposit_expire'])
           : null,
+            category: json['category'] != null ? Category.fromJson(json['category'] as Map<String, dynamic>) : null,
+      type: json['type'] != null ? Type.fromJson(json['type'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -393,6 +437,7 @@ class DepositItem {
   final int freeQuantity;
   final double finalSellPrice;
   final double finalCostPrice;
+  final Item? item;
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -414,6 +459,7 @@ class DepositItem {
       'free_quantity': freeQuantity,
       'finalSellPrice': finalSellPrice,
       'finalCostPrice': finalCostPrice,
+      'item': item?.toJson(),
     };
   }
 
@@ -437,6 +483,7 @@ class DepositItem {
     required this.freeQuantity,
     required this.finalSellPrice,
     required this.finalCostPrice,
+    required this.item,
   });
 
   factory DepositItem.fromJson(Map<String, dynamic> json) {
@@ -460,6 +507,7 @@ class DepositItem {
       freeQuantity: json['free_quantity'] as int,
       finalSellPrice: (json['finalSellPrice'] as num).toDouble(),
       finalCostPrice: (json['finalCostPrice'] as num).toDouble(),
+      item: json['item'] != null? Item.fromJson(json['item'] as Map<String, dynamic>) : null,
     );
   }
 }
@@ -481,8 +529,10 @@ class Deposit {
   final int isLocked;
   final int showAll;
   final Supplier supplier;
-  final User user;
-
+  final User? user;
+  final int? totalCost;
+  final int? totalPrice;
+  final List<DepositItem>? items;
   Deposit({
     required this.id,
     required this.supplierId,
@@ -501,6 +551,9 @@ class Deposit {
     required this.showAll,
     required this.supplier,
     required this.user,
+    required this.totalCost,
+    required this.totalPrice,
+    this.items
   });
 
   Map<String, dynamic> toJson() {
@@ -521,7 +574,10 @@ class Deposit {
       'is_locked': isLocked,
       'showAll': showAll,
       'supplier': supplier.toJson(),
-      'user': user.toJson(),
+      'user': user?.toJson(),
+      'total_cost': totalCost,
+      'total_price': totalPrice,
+      'items': items?.map((item) => item.toJson()),
     };
   }
 
@@ -542,8 +598,11 @@ class Deposit {
       vatCost: (json['vat_cost'] as num).toDouble(),
       isLocked: json['is_locked'] as int,
       showAll: json['showAll'] as int,
+      totalCost: json['total_cost'] as int?,
+      totalPrice: json['total_price'] as int?,
       supplier: Supplier.fromJson(json['supplier'] as Map<String, dynamic>),
-      user: User.fromJson(json['user'] as Map<String, dynamic>),
+      user: json['user']!= null? User.fromJson(json['user'] as Map<String, dynamic>) : null,
+      items:  json['items'] != null ? (json['items'] as List<dynamic>).map((item) => DepositItem.fromJson(item as Map<String, dynamic>)).toList() : [],
     );
   }
 }
@@ -690,42 +749,6 @@ class Role {
       guardName: json['guard_name'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
-  }
-}
-
-class PaymentType {
-  final int id;
-  final String name;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-
-  PaymentType({
-    required this.id,
-    required this.name,
-    this.createdAt,
-    this.updatedAt,
-  });
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-    };
-  }
-
-  factory PaymentType.fromJson(Map<String, dynamic> json) {
-    return PaymentType(
-      id: json['id'] as int,
-      name: json['name'] as String,
-      createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? DateTime.parse(json['updated_at'] as String)
-          : null,
     );
   }
 }

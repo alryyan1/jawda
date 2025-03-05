@@ -70,7 +70,7 @@ class Shift {
         throw Exception('Failed to fetch data');
       }
     } catch (e) {
-      print('Error: $e');
+      print('Error: $e ');
       rethrow;
     }
   }

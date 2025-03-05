@@ -8,7 +8,7 @@ class Client {
   final String email;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final List<Deduct>? deducts;
+ List<Deduct> deducts = [];
 
   Client({
     required this.id,
@@ -31,7 +31,7 @@ class Client {
       email: json['email'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
-    deducts: json['deducts']!=null ?  json['deducts'].map<Deduct>((deduct) => Deduct.fromJson(deduct)).toList() : null,
+    deducts: json['deducts']!=null ?  json['deducts'].map<Deduct>((deduct) => Deduct.fromJson(deduct)).toList() : [],
     );
   }
 

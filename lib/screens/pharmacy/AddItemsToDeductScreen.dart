@@ -10,6 +10,7 @@ import 'package:jawda/models/shift.dart';
 import 'package:jawda/providers/client_provider.dart';
 import 'package:jawda/providers/item_provider.dart';
 import 'package:jawda/providers/shift_provider.dart';
+import 'package:jawda/providers/socket_provider.dart';
 import 'package:jawda/screens/pdf_veiwer.dart';
 import 'package:jawda/screens/pharmacy/report_by_shift.dart';
 import 'package:jawda/services/dio_client.dart';
@@ -38,6 +39,7 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Provider.of<ItemProvider>(context, listen: false).getItems('');
   }
 
   @override
@@ -45,7 +47,6 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
 
-    Provider.of<ItemProvider>(context, listen: false).getItems('');
   }
 
   Future<void> _showItemDialog(BuildContext ctx, DeductItem item) async {
@@ -72,10 +73,8 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
                     onChanged: (value) async {
                       count = int.tryParse(value) ?? 1;
                       setState(() {
-                         
-                      totalPrice = item.price * count;
+                        totalPrice = item.price * count;
                       });
-                      
                     },
                   ),
                   Text('Total Price: ${NumberFormat().format(totalPrice)}'),
@@ -91,29 +90,27 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
               },
             ),
             TextButton(
-              child: _loading ? CircularProgressIndicator() :  Text('Save'),
+              child: _loading ? CircularProgressIndicator() : Text('Save'),
               onPressed: () async {
                 setState(() {
                   _loading = true;
                 });
-             try {
-                        final dio = DioClient.getDioInstance(context);
-                        var response = await dio.patch(
-                            'deductedItem/${item.id}',
-                            data: {'colName': 'box', 'val': count.toString()});
-                        var deductDataAsJson = response.data['data'];
-                        // context.watch<ShiftProvider>().updateAndNotify(deductDataAsJson); not working because its outside widget tree
-                        ctx
-                            .read<ShiftProvider>()
-                            .updateAndNotify(deductDataAsJson);
-                      } catch (e) {
-                        throw Exception(e.toString());
-                      }finally {
-                        setState(() {
-                          _loading = false;
-                        });
-                      }
-                     
+                try {
+                  final dio = DioClient.getDioInstance(context);
+                  var response = await dio.patch('deductedItem/${item.id}',
+                      data: {'colName': 'box', 'val': count.toString()});
+                  var deductDataAsJson = response.data['data'];
+                  // context.watch<ShiftProvider>().updateAndNotify(deductDataAsJson); not working because its outside widget tree
+                  ctx.read<ShiftProvider>().updateAndNotify(deductDataAsJson);
+                  context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(deductDataAsJson));
+                } catch (e) {
+                  throw Exception(e.toString());
+                } finally {
+                  setState(() {
+                    _loading = false;
+                  });
+                }
+
                 Navigator.of(context).pop();
               },
             ),
@@ -148,37 +145,45 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final _selectedDedduct = context.watch<ShiftProvider>().SelectedDeduct;
     return Scaffold(
       appBar: AppBar(
         title: Text(' No ${widget.deduct.number}'),
         actions: [
-          IconButton(
-            icon: Icon(Icons.picture_as_pdf),
-            onPressed: () async{
-              final dio =  DioClient.getDioInstance(context);
-              final response = await dio.get('deduct/invoice',queryParameters: {
-                'id':_selectedDedduct?.id.toString(),
-                'base64':'1'
-              });
-              var dataAsJson = response.data;
-              final pdfData = base64Decode(cleanBase64(dataAsJson));
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                // generateAndShowPdf(api, context, query)
-                return MyPdfViewer(pdfData: pdfData, id: _selectedDedduct!.id.toString());
-              },));
+          Consumer<ShiftProvider>(
+            builder: (context, shiftProvider, child) {
+           return   IconButton(
+              icon: Icon(Icons.picture_as_pdf),
+              onPressed: () async {
+                final dio = DioClient.getDioInstance(context);
+                final response = await dio.get('deduct/invoice',
+                    queryParameters: {
+                      'id': shiftProvider.SelectedDeduct?.id.toString(),
+                      'base64': '1'
+                    });
+                var dataAsJson = response.data;
+                final pdfData = base64Decode(cleanBase64(dataAsJson));
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) {
+                    // generateAndShowPdf(api, context, query)
+                    return MyPdfViewer(
+                        pdfData: pdfData, id: shiftProvider.SelectedDeduct!.id.toString());
+                  },
+                ));
+              },
+            );
             },
+            
           ),
         ],
       ),
-      body: Consumer2<ClientProvider, ShiftProvider>(
-        builder: (context, cleintProvider, shiftProvider, child) {
-          return Padding(
+      body:
+           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  DropdownSearch<Client>(
+            child: Column(
+              children: [
+                Consumer2<ShiftProvider,ClientProvider>(
+                  builder: (context, shiftProvider,clientProvider, child) {
+                    return DropdownSearch<Client>(
                     compareFn: (item1, item2) {
                       return item1.id == item2.id;
                     },
@@ -188,23 +193,27 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
                     itemAsString: (Client u) => u.name,
                     decoratorProps: const DropDownDecoratorProps(
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         icon: Icon(Icons.person),
                         labelText: "Select Client",
                         hintText: "Select client in menu",
                       ),
                     ),
-                    selectedItem: _selectedDedduct?.client,
+                    selectedItem: shiftProvider.SelectedDeduct?.client,
                     items: (filter, loadProps) {
-                      return cleintProvider.getClients(filter);
+                      return clientProvider.getClients(filter);
                     },
                     onChanged: (Client? data) async {
                       try {
                         final dio = DioClient.getDioInstance(context);
                         final response = await dio.patch(
-                            'deduct/${_selectedDedduct?.id}',
+                            'deduct/${shiftProvider.SelectedDeduct?.id}',
                             data: {'colName': 'client_id', 'val': data!.id});
                         final json = response.data;
                         shiftProvider.updateAndNotify(json['data']);
+                                          context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(json['data']));
+
+                        
                       } catch (e) {
                         throw Exception(e.toString());
                       }
@@ -212,53 +221,68 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
                       _selectedClient = data;
                       // });
                     },
-                  ),
-                  SizedBox(height: 16),
-                  Consumer<ItemProvider>(builder: (context, value, child) {
-                    return MultiSelectDialogField<Item>(
-                      searchable: true,
-                      items: value.items
-                          .map((item) =>
-                              MultiSelectItem<Item>(item, item.marketName))
-                          .toList(),
-                      selectedColor: Colors.blue.shade100,
-                      onConfirm: (values) {
-                        _selectedItems = values;
-                        // print(value.items);
-                      },
-                      title: Text("Select Items"),
-                      buttonText: Text(
-                        "Select Items",
-                        style: TextStyle(color: Colors.blue[800]),
+                  );
+                  },
+                  
+                ),
+                SizedBox(height: 16),
+               
+                           MultiSelectDialogField<Item>(
+                            // chipDisplay: MultiSelectChipDisplay.none(),
+                            searchable: true,
+
+                            items: Provider.of<ItemProvider>(context)
+                                .items
+                                .map((item) => MultiSelectItem<Item>(
+                                    item, item.marketName))
+                                .toList(),
+                            selectedColor: Colors.blue.shade100,
+                            onConfirm: (values) async {
+                             final Deduct? _deduct = await context
+                                  .read<ShiftProvider>()
+                                  .saveDeductItems(
+                                      values, widget.deduct, context);
+                                      Provider.of<SocketProvider>(context,listen: false). sendMessage('update deduct', jsonEncode(_deduct!.toJson()));
+                            
+                              print(values.map((e) => e.marketName).toList());
+                            },
+                            title: Text("Select Items"),
+                            buttonText: Text(
+                              "Select Items",
+                              style: TextStyle(color: Colors.blue[800]),
+                            ),
+                          
+                        
                       ),
-                    );
-                  }),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    'Selected Items',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 5),
-                  Consumer<ShiftProvider>(
-                      builder: (context, shiftProvider, child) {
-                    final selectedDeduct = shiftProvider.SelectedDeduct;
-                    return ListView.separated(
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  'Items',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 5),
+                Consumer<ShiftProvider>(
+                    builder: (context, shiftProvider, child) {
+                  final selectedDeduct = shiftProvider.SelectedDeduct;
+                  return Expanded(
+                    child: ListView.separated(
                       separatorBuilder: (context, index) => Divider(),
                       itemCount: selectedDeduct!.deductedItems.length,
-                      shrinkWrap: true,
+                      shrinkWrap: false,
                       itemBuilder: (context, index) {
                         final deductItem = selectedDeduct!.deductedItems[index];
                         return ListTile(
                             // style: ListTileStyle.drawer,
-                            leading: Icon(Icons.shopping_cart),
-                            isThreeLine: true,
+                            leading: Container(
+                              child: Text("${index + 1}"),
+                            ),
+                            // isThreeLine: true,
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('U.Price ${deductItem.price} '),
-                                Text('Box ${deductItem.box} '),
+                                // Text('Box ${deductItem.box} '),
                               ],
                             ),
                             trailing: Column(
@@ -273,56 +297,30 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
                                         setState(() {
                                           _selectedItems.remove(deductItem);
                                         });
-                                        await context
+                                     final Deduct? dd =   await context
                                             .read<ShiftProvider>()
-                                            .deleteDeductItem(deductItem,context);
+                                            .deleteDeductItem(
+                                                deductItem, context);
+                                                                  context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(dd!.toJson()));
+
                                       }),
                                 )
                               ],
                             ),
-                            title: Text(deductItem.item!.marketName),
+                            title: Text(deductItem.item!.marketName +
+                                ' ' +
+                                "(${deductItem.box.toString()})"),
                             onTap: () async {
                               await _showItemDialog(context, deductItem);
                             });
                       },
-                    );
-                  }),
-                  ElevatedButton(
-                    onPressed: _isLoading || _selectedDedduct?.complete == 1
-                        ? null
-                        : () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            await context
-                                .read<ShiftProvider>()
-                                .saveDeductItems(_selectedItems, widget.deduct,context);
-                            // Handle adding items logic here (e.g., send data to API)
-                            // await _addItemsToDeduct();
-                            setState(() {
-                              _isLoading = false;
-                            });
-                            Navigator.of(context)
-                                .pop(); // Navigate back to previous screen when done
-                            print(
-                                'Adding items to deduct ID: ${widget.deduct.id}');
-                            print('Selected client: ${_selectedClient?.name}');
-                            print(
-                                'Selected items: ${_selectedItems.map((item) => item.marketName).toList()}');
-                          },
-                    child: _isLoading
-                        ? CircularProgressIndicator()
-                        : Text(
-                            'Add Items'), // i want to reach the notifier here what  the best way to do it
-                  ),
-                  widget.deduct.deductedItems.length > 0
-                      ? DeductComplete(deduct: _selectedDedduct!)
-                      : Text('No Items')
-                ],
-              ),
+                    ),
+                  );
+                }),
+                DeductComplete(deduct: widget.deduct, items: _selectedItems)
+              ],
             ),
-          );
-        },
+         
       ),
     );
   }
@@ -332,10 +330,17 @@ class _AddItemsToDeductScreenState extends State<AddItemsToDeductScreen> {
   }
 }
 
-class DeductComplete extends StatelessWidget {
+class DeductComplete extends StatefulWidget {
   final Deduct deduct;
-  DeductComplete({super.key, required this.deduct});
+  List<Item> items;
+  DeductComplete({super.key, required this.deduct, required this.items});
 
+  @override
+  State<DeductComplete> createState() => _DeductCompleteState();
+}
+
+class _DeductCompleteState extends State<DeductComplete> {
+  bool isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Consumer<ShiftProvider>(builder: (context, shftProvider, child) {
@@ -351,39 +356,76 @@ class DeductComplete extends StatelessWidget {
           ),
           ListTile(
             title: Text('Total'),
-            trailing: Text(NumberFormat().format(deduct.totalPrice)),
+            trailing: Text(NumberFormat().format(shftProvider.SelectedDeduct?.totalPrice ?? 0)),
           ),
           Divider(),
           SizedBox(
             width: double.infinity,
-            child:deduct.complete == 1 ?  ElevatedButton(
-              style: ButtonStyle(backgroundColor: WidgetStatePropertyAll(Colors.red)),
-              onPressed: () async {
-                try {
-                  final dio = DioClient.getDioInstance(context);
-                  final response = await dio.get(
-                      'inventory/deduct/cancel/${deduct.id}',
-                      );
-                  shftProvider.updateAndNotify(response.data['data']);
-                } on DioException catch (e) {
-                  
-                }
-              },
-              child: Text('Cancel'),
-            ): ElevatedButton(
-              onPressed: () async {
-                try {
-                  final dio = DioClient.getDioInstance(context);
-                  final response = await dio.get(
-                      'inventory/deduct/complete/${deduct.id}',
-                      queryParameters: {'is_sell': '1'});
-                  shftProvider.updateAndNotify(response.data['data']);
-                } catch (e) {
-                  throw Exception(e.toString());
-                }
-              },
-              child: Text('COMPLETE'),
-            ),
+            child: widget.deduct.complete == 1
+                ? ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.red)),
+                    onPressed: () async {
+                      try {
+                        final dio = DioClient.getDioInstance(context);
+                        final response = await dio.get(
+                          'inventory/deduct/cancel/${widget.deduct.id}',
+                        );
+                        shftProvider.updateAndNotify(response.data['data']);
+                                          context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(response.data['data']));
+
+                      } on DioException catch (e) {}
+                    },
+                    child: Text('Cancel'),
+                  )
+                : Consumer<ShiftProvider>(
+                    builder: (context, shiftProvider, child) {
+                    final _selectedDedduct = shiftProvider.SelectedDeduct;
+                    return Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              final dio = DioClient.getDioInstance(context);
+                              final response = await dio.get(
+                                  'inventory/deduct/complete/${widget.deduct.id}',
+                                  queryParameters: {'is_sell': '1'});
+                              shftProvider
+                                  .updateAndNotify(response.data['data']);
+                                                    context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(response.data['data']));
+
+                            } catch (e) {
+                              throw Exception(e.toString());
+                            }
+                          },
+                          child: Text('COMPLETE'),
+                        ),
+                        _selectedDedduct?.complete == 1
+                            ? SizedBox()
+                            : ElevatedButton(
+                                onPressed:
+                                    isLoading || _selectedDedduct?.complete == 1
+                                        ? null
+                                        : () async {
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+                                            await context
+                                                .read<ShiftProvider>()
+                                                .saveDeductItems(widget.items,
+                                                    widget.deduct, context);
+                                            setState(() {
+                                              isLoading = false;
+                                            });
+                                          },
+                                child: isLoading
+                                    ? CircularProgressIndicator()
+                                    : Text(
+                                        'Add Items'), // i want to reach the notifier here what  the best way to do it
+                              ),
+                      ],
+                    );
+                  }),
           )
         ],
       );
