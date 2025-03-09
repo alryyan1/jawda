@@ -7,7 +7,6 @@ import 'package:jawda/models/pharmacy_models.dart';
 import 'package:jawda/providers/deposit_provider.dart';
 import 'package:jawda/providers/item_provider.dart';
 import 'package:jawda/providers/shift_provider.dart';
-import 'package:jawda/providers/socket_provider.dart';
 import 'package:jawda/screens/pdf_veiwer.dart';
 import 'package:jawda/services/dio_client.dart';
 import 'package:provider/provider.dart'; // Import Item and Deposit models
@@ -29,14 +28,18 @@ class _PurchaseItemsScreenState extends State<PurchaseItemsScreen> {
     // TODO: implement initState
     super.initState();
     context.read<ItemProvider>().getItems('');
+    getDeposit();
   }
 
+   void getDeposit(){
+
+    context.read<DepositProvider>().getDeposit(widget.deposit.id,context);
+   }
   Future<void> _showItemDialog(BuildContext ctx, DepositItem item) async {
-    int count = 0; // Initial count
-    double totalPrice = item.quantity * item.cost;
+    int quantity = item.quantity; // Initial count
     bool _loading = false;
-    int  cost = 0;
-    int  rprice = 0;
+    int  cost = item.cost.toInt() ;
+    int  rprice = item.sellPrice.toInt();
 
     return showDialog<void>(
       context: context,
@@ -46,39 +49,38 @@ class _PurchaseItemsScreenState extends State<PurchaseItemsScreen> {
           content: StatefulBuilder(
             // Use StatefulBuilder to update the dialog content
             builder: (BuildContext context, StateSetter setState) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.number,
-                    initialValue: item.quantity.toString(),
-                    decoration: InputDecoration(labelText: 'QYN'),
-                    onChanged: (value) async {
-                      count = int.tryParse(value) ?? 1;
-                      setState(() {
-                        totalPrice = item.cost * count;
-                      });
-                    },
-                  ),
-                     TextFormField(
-                    keyboardType: TextInputType.number,
-                    initialValue: item.quantity.toString(),
-                    decoration: InputDecoration(labelText: 'Cost'),
-                    onChanged: (value) async {
-                      cost = int.tryParse(value) ?? 1;
-              
-                    },
-                  ),
-                      TextFormField(
-                    keyboardType: TextInputType.number,
-                    initialValue: item.quantity.toString(),
-                    decoration: InputDecoration(labelText: 'R.Price'),
-                    onChanged: (value) async {
-                      rprice = int.tryParse(value) ?? 1;
-              
-                    },
-                  ),
-                ],
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      initialValue: item.quantity.toString(),
+                      decoration: InputDecoration(labelText: 'QYN'),
+                      onChanged: (value) async {
+                        quantity = int.tryParse(value) ?? 1;
+                      },
+                    ),
+                       TextFormField(
+                      keyboardType: TextInputType.number,
+                      initialValue: item.cost.toString(),
+                      decoration: InputDecoration(labelText: 'Cost'),
+                      onChanged: (value) async {
+                        cost = int.tryParse(value) ?? 1;
+                
+                      },
+                    ),
+                        TextFormField(
+                      keyboardType: TextInputType.number,
+                      initialValue: item.sellPrice.toString(),
+                      decoration: InputDecoration(labelText: 'R.Price'),
+                      onChanged: (value) async {
+                        rprice = int.tryParse(value) ?? 1;
+                
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           ),
@@ -97,10 +99,10 @@ class _PurchaseItemsScreenState extends State<PurchaseItemsScreen> {
                 });
                 try {
                   final dio = DioClient.getDioInstance(context);
-                  var response = await dio.patch('depositItems/update/${item.id}',
-                      data: {'colName': 'quantity', 'val': count.toString()});
+                  var response = await dio.patch('depositItems/updateMobile/${item.id}',
+                      data: {'cost': cost.toString(), 'sell_price': rprice.toString(),'quantity':quantity.toString()});
                   var depositsAsJson = response.data['data'];
-                  context.watch<DepositProvider>().setSelectedDeposit(Deposit.fromJson(depositsAsJson));
+                  context.read<DepositProvider>().setSelectedDeposit(Deposit.fromJson(depositsAsJson));
                   // ctx.read<DepositProvider>().updateDepositItem(deductDataAsJson);
                   // context.read<SocketProvider>().sendMessage('update deduct', jsonEncode(deductDataAsJson));
                 } catch (e) {

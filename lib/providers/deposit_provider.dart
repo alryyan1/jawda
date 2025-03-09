@@ -11,7 +11,16 @@ class DepositProvider with ChangeNotifier {
   List<Deposit> _deposits = [];
   Deposit? _selectedDeposit;
   Deposit get selectedDeposit => _selectedDeposit!;
-
+ List<Deposit> _loadedDeposits = [];
+ List<Deposit> get loadedDeposits => _loadedDeposits;
+void setLoadedDeposits(data){
+    _loadedDeposits =data;
+    notifyListeners();
+}
+void addDeposits(deposits){
+    _loadedDeposits.addAll(deposits);
+    notifyListeners();
+}
   void setSelectedDeposit(Deposit? deposit) {
     _selectedDeposit = deposit;
     notifyListeners();
@@ -46,7 +55,7 @@ class DepositProvider with ChangeNotifier {
       //  notifyListeners();
     }
   }
-  Future<List<DepositItem>> getDeposit(id,context) async {
+  Future<Deposit> getDeposit(id,context) async {
     try {
        _loading = true;
        _errorMessage = null;
@@ -54,12 +63,15 @@ class DepositProvider with ChangeNotifier {
        //dio
        final dio = DioClient.getDioInstance(context);
        final response = await dio.get(
-         'depositItems/$id',
+         'inventory/deposit/getDepositById/$id',
        );
 
        final dataAsJson = response.data;
-      final depositItemAsJson = dataAsJson as List<dynamic>;
-       return depositItemAsJson.map((e)=>DepositItem.fromJson(e)).toList();
+       final deposit = Deposit.fromJson(dataAsJson['data']);
+       _selectedDeposit = deposit;
+       notifyListeners();
+       return deposit;
+ 
     } catch (e) {
        _errorMessage = 'Failed to fetch deposits: $e';
        print(_errorMessage);
@@ -89,6 +101,8 @@ class DepositProvider with ChangeNotifier {
        final dataAsJson = response.data;
       
        final Deposit addedDeposit =  Deposit.fromJson(dataAsJson['data']);
+       _loadedDeposits.insert(0, addedDeposit);
+       notifyListeners();
         return addedDeposit;
     } catch (e) {
        _errorMessage = 'Failed to add new deposit: $e';

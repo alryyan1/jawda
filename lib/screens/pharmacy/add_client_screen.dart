@@ -93,6 +93,7 @@ class _AddClientScreenState extends State<AddClientScreen> {
                       address: _addressController.text,
                       email: _emailController.text,
                       deducts: [],
+                      payments: [],
                       createdAt: DateTime.now(), // Use a default value for createdAt
                       updatedAt: DateTime.now(), // Use a default value for updatedAt
                     );

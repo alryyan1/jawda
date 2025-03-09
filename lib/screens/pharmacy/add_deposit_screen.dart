@@ -9,8 +9,6 @@ import 'package:provider/provider.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 
 class AddDepositScreen extends StatefulWidget {
-  List<Deposit> deposits ;
-  AddDepositScreen({required this.deposits});
   @override
   _AddDepositScreenState createState() => _AddDepositScreenState();
 }
@@ -142,9 +140,7 @@ class _AddDepositScreenState extends State<AddDepositScreen> {
                          final Deposit freshDeposit =   await Provider.of<DepositProvider>(context,
                                     listen: false)
                                 .addDeposit(newDeposit, context);
-                                setState(() {
-                                  widget.deposits.insert(0, freshDeposit);
-                                });
+                                  
 
                             // Close the screen after adding the deposit
                             Navigator.pop(context);

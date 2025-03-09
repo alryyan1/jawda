@@ -7,6 +7,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:http/http.dart' as http;
 import 'package:jawda/providers/shift_provider.dart';
 import 'package:jawda/screens/pharmacy/AddItemsToDeductScreen.dart';
+import 'package:jawda/services/sockets.dart';
 import 'package:provider/provider.dart';
 
 class Pos extends StatefulWidget {
@@ -62,9 +63,12 @@ class _PosState extends State<Pos> {
                       IconButton(
                         onPressed: () async {
                           try {
-                            await Provider.of<ShiftProvider>(context,
+                           final Deduct? freshDeduct = await Provider.of<ShiftProvider>(context,
                                     listen: false)
                                 .addDeduct();
+                                SocketService().sendMessage('new deduct', jsonEncode(freshDeduct!.toJson()));
+                                
+                                
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text('Error: ${e.toString()}')));

@@ -1,3 +1,4 @@
+import 'package:jawda/models/client_payment.dart';
 import 'package:jawda/models/pharmacy_models.dart';
 
 class Client {
@@ -9,6 +10,7 @@ class Client {
   final DateTime createdAt;
   final DateTime updatedAt;
  List<Deduct> deducts = [];
+ List<ClientPayment> payments = [];
 
   Client({
     required this.id,
@@ -19,6 +21,7 @@ class Client {
     required this.createdAt,
     required this.updatedAt,
     required this.deducts,
+    required this.payments,
     
   });
 
@@ -32,6 +35,7 @@ class Client {
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     deducts: json['deducts']!=null ?  json['deducts'].map<Deduct>((deduct) => Deduct.fromJson(deduct)).toList() : [],
+    payments: json['payments']!=null ?  json['payments'].map<ClientPayment>((payment) => ClientPayment.fromJson(payment)).toList() : [],
     );
   }
 
@@ -44,7 +48,8 @@ class Client {
       'email': email,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
-      'deducts': deducts?.map((deduct) => deduct.toJson()).toList(),
+      'deducts': deducts.map((deduct) => deduct.toJson()).toList(),
+      'payments': payments.map((payment) => payment.toJson()).toList(),
     };
   }
 }

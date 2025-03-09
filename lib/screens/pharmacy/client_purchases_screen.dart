@@ -49,8 +49,10 @@ class ClientPurchases extends StatelessWidget {
                         children: [
                           Divider(),
                           ListTile(
-                            title: Text(DateFormat().format(deduct.createdAt)),
-                            subtitle: Text(NumberFormat().format(deduct.paid)),
+                            tileColor: deduct.complete == 1 ? Colors.green.shade100 : Colors.white,
+                            leading: Text((index+1).toString()),
+                            title: Text(DateFormat('yyyy-MM-dd').format(deduct.createdAt)),
+                            subtitle: Text(NumberFormat().format(deduct.totalPrice)),
                             trailing: IconButton(
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(

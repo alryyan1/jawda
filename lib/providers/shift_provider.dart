@@ -79,7 +79,7 @@ class ShiftProvider with ChangeNotifier {
 
   void updateAndNotify(Map<String, dynamic> deduct) {
     final deductObj = Deduct.fromJson(deduct);
-    int indexOf = shift!.deducts.indexWhere((d) => d.id == deductObj.id);
+    int indexOf = shift?.deducts.indexWhere((d) => d.id == deductObj.id) ?? -1;
     if (indexOf != -1) {
       shift!.deducts[indexOf] = deductObj;
       _selectedDedduct = deductObj;
@@ -90,8 +90,24 @@ class ShiftProvider with ChangeNotifier {
     // sendMessage('update deduct', jsonEncode(deduct));
     notifyListeners();
   }
+  void getDeductById(int id , BuildContext context) async{
+    final dio = DioClient.getDioInstance(context);
+    final response = await dio.get('inventory/deduct/showDeductById/$id');
+    final deductAsJson = response.data;
+    final deductObj = Deduct.fromJson(deductAsJson['data']);
+    int indexOf = shift?.deducts.indexWhere((d) => d.id == deductObj.id) ?? -1;
+    if (indexOf != -1) {
+      shift!.deducts[indexOf] = deductObj;
+      _selectedDedduct = deductObj;
+      notifyListeners();
+    } else {
+      print('deduct not found');
+    }
+    // sendMessage('update deduct', jsonEncode(deduct));
+  }
 
-  Future<void> addDeduct() async {
+
+  Future<Deduct?> addDeduct() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -101,6 +117,7 @@ class ShiftProvider with ChangeNotifier {
       _shift!.deducts.insert(0, _selectedDedduct!);
       // sendMessage('new deduct', jsonEncode(_selectedDedduct!.toJson()));
       notifyListeners();
+      return _selectedDedduct;
     } 
     on TypeError catch(e){
       _errorMessage = "Error $e  at ${e.stackTrace}";

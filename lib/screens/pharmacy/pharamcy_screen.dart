@@ -9,94 +9,136 @@ import 'near_expire_screen.dart';
 import 'inventory_screen.dart';
 
 class PharmacyScreen extends StatelessWidget {
-  const PharmacyScreen({super.key});
+  const PharmacyScreen({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Pharmacy'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
-          children: [
-            _buildGridItem(
-                context, 'Sales', Icons.monetization_on, colorScheme.primary,
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SaledateinfoList()),
-              );
-            }),
-            _buildGridItem(
-                context, 'Near Expire', Icons.warning, colorScheme.secondary,
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NearExpireScreen()),
-              );
-            }),
-            _buildGridItem(
-                context, 'Inventory', Icons.inventory, colorScheme.tertiary,
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => InventoryScreen()),
-              );
-            }),
-            _buildGridItem(
-                context, 'Shifts', Icons.inventory, colorScheme.tertiary, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ReportByShift()),
-              );
-            }),
-            _buildGridItem(
-                context, 'POS', Icons.shopping_cart, colorScheme.tertiary, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Pos()),
-              );
-            }),
-            _buildGridItem(
-                context, 'Clients', Icons.person, colorScheme.tertiary, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Clients()),
-              );
-            }),
-            _buildGridItem(
-                context, 'Items', Icons.add_box, colorScheme.tertiary, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ItemsScreen()),
-              );
-            }),
+    return Directionality(
+      textDirection: TextDirection.rtl, // Set text direction to RTL
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('الصيدلية'),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+            children: [
               _buildGridItem(
-                context, 'Purchases', Icons.add_box, colorScheme.tertiary, () {
-              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => PurchasesScreen()),
-              );
-            }),
-          ],
+                'المبيعات',
+                Icons.monetization_on,
+                colorScheme.primary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SaledateinfoList()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'قريب الانتهاء',
+                Icons.warning,
+                colorScheme.secondary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NearExpireScreen()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'المخزون',
+                Icons.inventory,
+                colorScheme.tertiary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => InventoryScreen()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'الورديات',
+                Icons.history,
+                colorScheme.primary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ReportByShift()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'نقاط البيع',
+                Icons.shopping_cart,
+                colorScheme.secondary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Pos()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'العملاء',
+                Icons.person,
+                colorScheme.tertiary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Clients()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'الأصناف',
+                Icons.add_box,
+                colorScheme.primary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ItemsScreen()),
+                  );
+                },
+              ),
+              _buildGridItem(
+                context,
+                'المشتريات',
+                Icons.shopping_bag,
+                colorScheme.secondary,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PurchasesScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildGridItem(BuildContext context, String title, IconData icon,
-      Color color, VoidCallback onTap) {
+  Widget _buildGridItem(BuildContext context, String title, IconData icon, Color color, VoidCallback onTap) {
+    final colorScheme = Theme.of(context).colorScheme; // Get color scheme
+
     return InkWell(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withOpacity(0.1), // Use color with opacity
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(color: color, width: 2),
         ),
@@ -116,6 +158,7 @@ class PharmacyScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
                 color: color,
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

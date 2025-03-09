@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
+import 'package:jawda/models/client_payment.dart';
 import 'package:jawda/services/dio_client.dart';
 import '../models/client.dart';
 class ClientProvider with ChangeNotifier {
   List<Client> _clients = List.empty();
+  Client? _selectedClient ;
+  Client? get selectedClient => _selectedClient;
+   void setSelectedClient(Client? value) {
+    _selectedClient = value;
+    //update _clients for new value
+    if (_selectedClient!= null) {
+      _clients = _clients.map((client)  {
+        if (client.id == _selectedClient!.id) {
+          return value!;
+        }
+        return client;
+      }).toList();
+     
+    }
+    notifyListeners();
+  }
   bool _loading = false;
   String? _errorMessage ;
   List<Client> get clients => _clients;
   bool get isLoading => _loading;
   String? get errorMessage => _errorMessage;
+   List<ClientPayment> _payments = [];
+    List<ClientPayment> get payments => _payments;
 Future<void> addClient(Client client,BuildContext context) async {
     try {
       final dio = DioClient.getDioInstance(context);
@@ -53,7 +73,7 @@ Future<void> addClient(Client client,BuildContext context) async {
 
      }
      try {
-      List<Client> _clients =  await  axiosList<Client>('client/all', {'name':filter}, Client.fromJson, null);
+      _clients =  await  axiosList<Client>('client/all', {'name':filter,'load':'deducts'}, Client.fromJson, null);
       return _clients;
      } catch (e) {
       throw Exception(
@@ -68,4 +88,42 @@ Future<void> addClient(Client client,BuildContext context) async {
      }
   }
 
+
+
+
+  Future<void> addPayment(ClientPayment payment,context) async {
+    _loading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final dio = DioClient.getDioInstance(context);
+      final response = await dio.post(
+        '/clientPayment',  // Replace with your API endpoint
+        data:{
+          'client_id':payment.clientId,
+          'amount': payment.amount,
+          'payment_date': DateFormat('yyyy-MM-dd').format(payment.paymentDate),
+        },
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) { // Assuming 201 Created on success
+        final clientAsJson = response.data;
+        final Client freshClient = Client.fromJson(clientAsJson);
+        setSelectedClient(freshClient); // Notify listeners
+        print('Payment added successfully');
+      } else {
+        _errorMessage = 'Failed to add payment: ${response.statusCode}';
+        notifyListeners();
+        print('Failed to add payment: ${response.statusCode}');
+      }
+    } catch (e) {
+      _errorMessage = 'Error adding payment: $e';
+      notifyListeners();
+      print('Error: $e');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
 }

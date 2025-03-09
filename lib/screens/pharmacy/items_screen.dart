@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:intl/intl.dart';
 import 'package:jawda/models/pharmacy_models.dart';
 import 'package:jawda/providers/item_provider.dart';
@@ -22,9 +23,12 @@ class _ItemsScreenState extends State<ItemsScreen> {
 
     
       await Provider.of<ItemProvider>(context,listen: false).getItems('');
-      setState(() {
+      if(SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle){
+         setState(() {
         items = Provider.of<ItemProvider>(context,listen: false).items;
       });
+      }
+     
   }
 
   @override
@@ -60,74 +64,74 @@ class _ItemsScreenState extends State<ItemsScreen> {
               return Center(child: Text('No items found.'));
             }
         
-            return Column(
-              children: [
-                TextField(
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.search)
-                  ),
-                  onSubmitted: (value) {
-                   setState(() {
-                     items = itemProvider.items.where((element) => element.marketName.toLowerCase().contains(value),).toList();
-                   });
-                  },
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    padding: EdgeInsets.all(16.0),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      return Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.0),
-                        ),
-                        color: colorScheme.surface,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.marketName,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface,
-                                ),
-                              ),
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('R.Price: ${NumberFormat('#,###.##', 'en_US').format(item.lastDepositItem?.sellPrice)}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                                  Text('Expire: ${DateFormat('yyyy-MM-dd').format(item.lastDepositItem!.expire ?? DateTime(2025))}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text('Cost: ${NumberFormat().format(item.lastDepositItem?.cost)}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                              SizedBox(height: 8),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => AddEditItemScreen(item: item,id:item.id)),
-                                    );
-                                  },
-                                  child: Text('Edit'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      suffixIcon: Icon(Icons.search)
+                    ),
+                    onSubmitted: (value) {
+                     setState(() {
+                       items = itemProvider.items.where((element) => element.marketName.toLowerCase().contains(value),).toList();
+                     });
                     },
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: ListView.builder(
+                      padding: EdgeInsets.all(16.0),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return InkWell(
+                          onTap: () {
+                              Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => AddEditItemScreen(item: item,id:item.id)),
+                                      );
+                          },
+                          child: Card(
+                            
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            color: colorScheme.surface,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.marketName,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: colorScheme.onSurface,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text('R.Price: ${NumberFormat('#,###.##', 'en_US').format(item.lastDepositItem?.sellPrice)}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                                      Text('Expire: ${DateFormat('yyyy-MM-dd').format(item.lastDepositItem!.expire ?? DateTime(2025))}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text('Cost: ${NumberFormat().format(item.lastDepositItem?.cost)}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                            
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),
