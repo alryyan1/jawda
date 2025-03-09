@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:http/http.dart' as http;
 import 'package:jawda/constansts.dart';
+import 'package:jawda/screens/signature_screen.dart';
+import 'package:jawda/services/dio_client.dart';
 import '../models/finance_account.dart';
 
 class AddJournalEntryScreen extends StatefulWidget {
@@ -21,6 +24,7 @@ class _AddJournalEntryScreenState extends State<AddJournalEntryScreen> {
   List<DebitCreditEntry> _creditEntries = [DebitCreditEntry()];
   List<FinanceAccount> _accounts = [];
   bool _isLoading = false;
+
 
   @override
   void initState() {
@@ -246,6 +250,15 @@ class _AddJournalEntryScreenState extends State<AddJournalEntryScreen> {
                     },
                     child: const Text("Add Credit Account")),
                 const SizedBox(height: 24),
+            //       ElevatedButton(
+            //   onPressed: _addSignature,
+            //   child: Text('Add Signature'),
+            // ),
+            // if (_signatureImage != null)
+            //   Image.memory(
+            //     _signatureImage!,
+            //     height: 100,
+            //   ),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _submitForm,
                   child: _isLoading

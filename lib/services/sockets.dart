@@ -8,7 +8,7 @@ class SocketService {
   late IO.Socket _socket;
 
   SocketService._internal() {
-    _socket = IO.io('${schema}://${socketHost}', <String, dynamic>{
+    _socket = IO.io('${schema}://${host}:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });

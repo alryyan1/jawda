@@ -1,2 +1,0 @@
-C:/xampp/htdocs/jawda/android/app/.cxx/Debug/2465gd6r/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/xampp/htdocs/jawda/android/app/.cxx/Debug/2465gd6r/armeabi-v7a/CMakeFiles/rebuild_cache.dir

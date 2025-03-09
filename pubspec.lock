@@ -222,6 +222,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_colorpicker:
+    dependency: "direct main"
+    description:
+      name: flutter_colorpicker
+      sha256: "969de5f6f9e2a570ac660fb7b501551451ea2a1ab9e2097e89475f60e07816ea"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   flutter_hooks:
     dependency: "direct main"
     description:
@@ -769,10 +777,10 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "634adbc5c7d41e31513e9e3d60213bbc6aedff6e90ddb23b6495bfc0a23a260e"
+      sha256: "5a1a76eef118e511443b299925d4a802eb8259388d6a580e0ad6413d1a70f987"
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.6"
+    version: "28.2.9"
   syncfusion_flutter_pdf:
     dependency: transitive
     description:
@@ -790,13 +798,13 @@ packages:
     source: hosted
     version: "28.2.6"
   syncfusion_flutter_signaturepad:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_signaturepad
-      sha256: "83a591601111fe48557778db25f7173731db03d68b8dc9fec957fc6f2caa1fe6"
+      sha256: "17b51b8ddc021f1c187234fc21360d46d006d402664ad655ce2218efaa7d910f"
       url: "https://pub.dev"
     source: hosted
-    version: "28.2.6"
+    version: "28.2.9"
   syncfusion_pdfviewer_macos:
     dependency: transitive
     description:
