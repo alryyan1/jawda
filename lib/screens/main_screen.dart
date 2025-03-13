@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:jawda/screens/account_summary.dart';
+import 'package:jawda/screens/doctor_schedule.dart';
 import 'package:jawda/screens/finance_screen.dart';
 import 'package:jawda/screens/pharmacy/pharamcy_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -137,6 +138,12 @@ class _MainScreenState extends State<MainScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => PharmacyScreen()),
+                      );
+                    }),
+                     _buildGridItem(context, 'جدول الاطباء', Icons.local_pharmacy, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => DoctorScheduleManagerScreen()),
                       );
                     }),
                   ],

@@ -164,6 +164,7 @@ class _AddDoctorScreenState extends State<AddDoctorScreen> {
                       labPercentage: double.parse(_labPercentageController.text),
                       specialistId: int.parse(_specialistIdController.text),
                       start: int.parse(_startController.text),
+                      schedules: []
                     );
 
                     Provider.of<DoctorProvider>(context, listen: false).addDoctor(newDoctor);

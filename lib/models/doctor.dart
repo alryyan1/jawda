@@ -1,3 +1,5 @@
+import 'package:jawda/models/doctor_schedule.dart';
+
 class Doctor {
   final int id;
   final String name;
@@ -10,7 +12,7 @@ class Doctor {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final int start;
-
+final List<DoctorSchedule> schedules;
   Doctor({
     required this.id,
     required this.name,
@@ -23,6 +25,7 @@ class Doctor {
     this.createdAt,
     this.updatedAt,
     required this.start,
+    required this.schedules,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -37,6 +40,7 @@ class Doctor {
       specialistId: json['specialist_id'] as int,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at'] as String) : null,
       updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at'] as String) : null,
+      schedules: json['schedules'] != null ? (json['schedules'] as List<dynamic>).map((schedule) => DoctorSchedule.fromJson(schedule)).toList() : [] ,
       start: json['start'] as int,
     );
   }

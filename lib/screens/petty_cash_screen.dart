@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:jawda/models/petty_cash.dart';
 import 'package:jawda/models/pharmacy_models.dart';
 import 'package:jawda/providers/deposit_provider.dart';
 import 'package:jawda/screens/pdf_veiwer.dart';
+import 'package:jawda/screens/petty_approve_screen.dart';
 import 'package:jawda/screens/pharmacy/add_deposit_screen.dart';
 import 'package:jawda/screens/pharmacy/deposit_items_screen.dart';
 import 'package:jawda/screens/signature_screen.dart';
@@ -198,67 +200,74 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                   separatorBuilder: (context, index) => Divider(),
                   itemBuilder: (context, index) {
                     final expense = _expenses[index];
-                    return Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                      ),
-                      color: colorScheme.surface,
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: colorScheme.primaryContainer,
-                          foregroundColor: colorScheme.onPrimaryContainer,
-                          child: IconButton(
-                              onPressed: () async {
-                                final dio = DioClient.getDioInstance(context);
-                                final response = await dio
-                                    .get('pettycash2/${expense.id}', queryParameters: {
-                                  'base64': '1',
-                                  'id': expense.id.toString()
-                                });
-                                if (response.statusCode == 200) {
-                                  final pdfRaw = response.data;
-                                  final cleanedRaw = cleanBase64(pdfRaw);
-                                  final pdfUnit8 = base64Decode(cleanedRaw);
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => MyPdfViewer(
-                                        pdfData: pdfUnit8,
-                                        id: expense.id.toString()),
-                                  ));
-                                }
-                              },
-                              icon: Icon(
-                                  Icons.picture_as_pdf)), // Use a relevant icon
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                          return PettyApproveScreen(expense: expense,);
+                        },));
+                      },
+                      child: Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.0),
                         ),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ' (${expense.id}) ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface),
-                            ),
-                            Text(
-                              ' (${expense.description}) ',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: colorScheme.onSurface),
-                            ),
-                          ],
+                        color: colorScheme.surface,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: colorScheme.primaryContainer,
+                            foregroundColor: colorScheme.onPrimaryContainer,
+                            child: IconButton(
+                                onPressed: () async {
+                                  final dio = DioClient.getDioInstance(context);
+                                  final response = await dio
+                                      .get('pettycash2/${expense.id}', queryParameters: {
+                                    'base64': '1',
+                                    'id': expense.id.toString()
+                                  });
+                                  if (response.statusCode == 200) {
+                                    final pdfRaw = response.data;
+                                    final cleanedRaw = cleanBase64(pdfRaw);
+                                    final pdfUnit8 = base64Decode(cleanedRaw);
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => MyPdfViewer(
+                                          pdfData: pdfUnit8,
+                                          id: expense.id.toString()),
+                                    ));
+                                  }
+                                },
+                                icon: Icon(
+                                    Icons.picture_as_pdf)), // Use a relevant icon
+                          ),
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                ' (${expense.id}) ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface),
+                              ),
+                              Text(
+                                ' (${expense.description}) ',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: colorScheme.onSurface),
+                              ),
+                            ],
+                          ),
+                          subtitle: Text(
+                            'Amount: ${NumberFormat('#,###.##', 'en_US').format(double.parse(expense.amount))}',
+                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                          ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.border_color_rounded),
+                            onPressed: () {
+                              _addSignature(expense.id);
+                            },
+                          ),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         ),
-                        subtitle: Text(
-                          'Amount: ${NumberFormat('#,###.##', 'en_US').format(double.parse(expense.amount))}',
-                          style: TextStyle(color: colorScheme.onSurfaceVariant),
-                        ),
-                        trailing: IconButton(
-                          icon: Icon(Icons.border_color_rounded),
-                          onPressed: () {
-                            _addSignature(expense.id);
-                          },
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       ),
                     );
                   },

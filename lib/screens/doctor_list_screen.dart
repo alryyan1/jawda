@@ -283,6 +283,7 @@ class DoctorListItem extends StatelessWidget {
                     start: int.parse(startController.text),
                     createdAt: doctor.createdAt,
                     updatedAt: doctor.updatedAt,
+                    schedules: []
                   );
 
                   Provider.of<DoctorProvider>(context, listen: false).updateDoctor(updatedDoctor);

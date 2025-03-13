@@ -13,6 +13,8 @@ class Expense {
   final int userId;
   final String signatureFileName;
   final FinanceEntry entry;
+  final DateTime? managerApprovalTime;
+  final DateTime? auditorApprovalTime;
 
   Expense({
     required this.id,
@@ -27,6 +29,9 @@ class Expense {
     required this.userId,
     required this.signatureFileName,
     required this.entry,
+    this.managerApprovalTime,
+    this.auditorApprovalTime,
+  
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) {
@@ -43,6 +48,8 @@ class Expense {
       userId: json['user_id'] as int,
       signatureFileName: json['signature_file_name'] as String,
       entry: FinanceEntry.fromJson(json['entry'] as Map<String, dynamic>),
+      managerApprovalTime: json['manager_approved_time'] != null? DateTime.parse(json['manager_approved_time'] as String) : null,
+      auditorApprovalTime: json['auditor_approved_time'] != null? DateTime.parse(json['auditor_approved_time'] as String) : null,
     );
   }
 }

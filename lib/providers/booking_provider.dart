@@ -36,19 +36,19 @@ class BookingProvider with ChangeNotifier {
       // For now, initialize with empty objects if there are no existing schedules:
       _schedules = [
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 1, timeSlot: TimeSlot.morning, startTime: '08:00', endTime: '12:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 1, timeSlot: TimeSlot.morning, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 2, timeSlot: TimeSlot.evening, startTime: '14:00', endTime: '18:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 2, timeSlot: TimeSlot.evening, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 3, timeSlot: TimeSlot.morning, startTime: '08:00', endTime: '12:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 3, timeSlot: TimeSlot.morning, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 4, timeSlot: TimeSlot.evening, startTime: '14:00', endTime: '18:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 4, timeSlot: TimeSlot.evening, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 5, timeSlot: TimeSlot.morning, startTime: '08:00', endTime: '12:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 5, timeSlot: TimeSlot.morning, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 6, timeSlot: TimeSlot.evening, startTime: '14:00', endTime: '18:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 6, timeSlot: TimeSlot.evening, ),
         DoctorSchedule(
-            id: 0, doctorId: doctorId, dayOfWeek: 7, timeSlot: TimeSlot.morning, startTime: '08:00', endTime: '12:00'),
+            id: 0, doctorId: doctorId, dayOfWeek: 7, timeSlot: TimeSlot.morning, ),
       ];
 
     } catch (error) {

@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jawda/constansts.dart';
+import 'package:jawda/main.dart';
+import 'package:jawda/models/pharmacy_models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main_screen.dart'; // Import your main screen
 
@@ -40,6 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
         if (response.statusCode == 200) {
           final decodedData = json.decode(response.body);
           print(decodedData);
+          final user = User.fromJson(decodedData['user']);
+          final token = await FirebaseMessaging.instance.getToken();
+          saveTokenToFirestore(token,user.id);
           // Assuming the response contains 'access_token' or similar
           final accessToken = decodedData['token']; // Adjust based on your API response
 

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:http/http.dart' as http;
+import 'package:jawda/constansts.dart';
 import '../models/doctor.dart';
 
 class DoctorProvider with ChangeNotifier {
@@ -12,11 +14,14 @@ class DoctorProvider with ChangeNotifier {
   List<Doctor> get doctors => _doctors;
   bool get isLoading => _isLoading;
 
-  Future<void> fetchDoctors() async {
+  Future<List<Doctor>> fetchDoctors() async {
     _isLoading = true;
-      notifyListeners();
+    if(SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle){
 
-    final url = Uri.parse('http://192.168.100.70/laravel-react-app/public/api/doctors');
+      notifyListeners();
+    }
+
+    final url = Uri.parse('$schema://$host/$path/doctors');
 
     try {
       final response = await http.get(url);
@@ -24,7 +29,10 @@ class DoctorProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final List<dynamic> decodedData = json.decode(response.body);
         _allDoctors = decodedData.map((item) => Doctor.fromJson(item)).toList();
+        _doctors = _allDoctors;
+        notifyListeners();
         _filterDoctors(); // Initial filtering based on keyword
+        return _allDoctors;
       } else {
         // Handle error (e.g., show a snackbar)
         print('Failed to load doctors: ${response.statusCode}');

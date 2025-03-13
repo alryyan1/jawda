@@ -12,16 +12,16 @@ import '../models/finance_account.dart';
 import 'package:path_provider/path_provider.dart'; // Import path_provider
 import 'package:pdfrx/pdfrx.dart'; // Import pdfrx
 
-const schema = 'https';
-const host = 'alroomy.a.pinggy.link';
+const schema = 'http';
+// const host = 'alroomy.a.pinggy.link';
 // const socketHost = 'altohami.a.pinggy.link';
 // const socketHost = 'rnnvc-196-202-136-105.a.free.pinggy.link';
 // const host = 'altohami.a.pinggy.link';
-// const host = '192.168.100.70';
+const host = '192.168.100.70';
 // const host = '192.168.137.1';
 // const path = 'mirgani/public/api';
-// const path = 'laravel-react-app/public/api';
-const path = 'alroomy/public/api';
+const path = 'laravel-react-app/public/api';
+// const path = 'alroomy/public/api';
 
 getHeaders() async {
   final instance = await SharedPreferences.getInstance();
