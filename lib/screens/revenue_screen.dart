@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/models/finance_account.dart';
 import 'package:http/http.dart' as http;
+import 'package:jawda/screens/revenue_screen_details.dart';
 
 class RevenueScreen extends StatefulWidget {
   RevenueScreen({
@@ -18,7 +19,7 @@ class RevenueScreen extends StatefulWidget {
 class _RevenueScreenState extends State<RevenueScreen> {
   bool _isLoading = false;
   Future<List<FinanceAccount>> _getDate() async {
-    final url = Uri(scheme: schema, host: host, path: '$path/financeAccounts');
+    final url = Uri(scheme: schema, host: host, path: '$path/financeAccounts-revenues');
     try {
       setState(() {
         _isLoading = true;
@@ -77,37 +78,40 @@ class _RevenueScreenState extends State<RevenueScreen> {
                   itemCount: accounts!.length,
                   itemBuilder: (context, index) {
                     final account = accounts[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.monetization_on,
-                                color:
-                                    colorScheme.primary), // Use a relevant icon
-                            SizedBox(width: 8),
-                            Text(
-                              account.name,
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: colorScheme
-                                    .onSurface, // Use onSurface color for the text
+                    return InkWell(
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => RevenueScreenDetails(financeAccount: account),)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(Icons.monetization_on,
+                                  color:
+                                      colorScheme.primary), // Use a relevant icon
+                              SizedBox(width: 8),
+                              Text(
+                                account.name,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: colorScheme
+                                      .onSurface, // Use onSurface color for the text
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                    
-                        _buildAmountRow(
-                          ' Amount',
-                          NumberFormat('#,###.##', 'en_US')
-                              .format(account.balance),
-                          colorScheme.secondary,
-                          icon: Icons.money, // Add icon
-                        ),
-                        const Divider(height: 24, thickness: 1),
-                        
-                      ],
+                            ],
+                          ),
+                      
+                          _buildAmountRow(
+                            ' Amount',
+                            NumberFormat('#,###.##', 'en_US')
+                                .format(account.balance),
+                            colorScheme.secondary,
+                            icon: Icons.money, // Add icon
+                          ),
+                          const Divider(height: 24, thickness: 1),
+                          
+                        ],
+                      ),
                     );
                   },
                   shrinkWrap: true,

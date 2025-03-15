@@ -243,10 +243,10 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                               },
                               icon: Icon(Icons.picture_as_pdf)),
                           title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                ' (${expense.id}) ',
+                                'رقم الاذن (${expense.id})  ',
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: colorScheme.onSurface),
@@ -282,7 +282,7 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                                               : SizedBox()
                                         ],
                                       ),
-                                      expense.pdfFile == null ? SizedBox() : IconButton(
+                                      expense.pdfFile == null ? SizedBox() : ElevatedButton(
                               onPressed: () async {
                                 final dio = DioClient.getDioInstance(context);
                                 final response = await dio.get(
@@ -302,7 +302,7 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                                   ));
                                 }
                               },
-                              icon: Icon(Icons.remove_red_eye)),
+                              child: Text('المستند')),
                                     ],
                                   ),
                                 ),

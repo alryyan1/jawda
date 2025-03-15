@@ -90,14 +90,14 @@ class _MainScreenState extends State<MainScreen> {
                             builder: (context) => DoctorListScreen()),
                       );
                     }),
-                    _buildGridItem(context, 'الإعدادات', Icons.settings, () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('صفحة الإعدادات قيد الإنشاء')));
-                    }),
-                    _buildGridItem(context, 'المختبر', Icons.science, () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('صفحة المختبر قيد الإنشاء')));
-                    }),
+                    // _buildGridItem(context, 'الإعدادات', Icons.settings, () {
+                    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    //       content: Text('صفحة الإعدادات قيد الإنشاء')));
+                    // }),
+                    // _buildGridItem(context, 'المختبر', Icons.science, () {
+                    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    //       content: Text('صفحة المختبر قيد الإنشاء')));
+                    // }),
                     _buildGridItem(context, 'المالية', Icons.attach_money, () {
                       Navigator.push(
                         context,
