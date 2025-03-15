@@ -4,6 +4,7 @@ import 'package:jawda/screens/account_summary.dart';
 import 'package:jawda/screens/doctor_schedule.dart';
 import 'package:jawda/screens/finance_screen.dart';
 import 'package:jawda/screens/pharmacy/pharamcy_screen.dart';
+import 'package:jawda/screens/revenue_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login_screen.dart';
 import 'doctor_list_screen.dart';
@@ -14,10 +15,9 @@ import 'package:intl/intl.dart' as intl;
 import '../models/finance_account.dart';
 
 class MainScreen extends StatefulWidget {
-  late FinanceAccount? bankAccount;
-  late FinanceAccount? cashAccount;
-
-  MainScreen({Key? key, this.bankAccount, this.cashAccount}) : super(key: key);
+  MainScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -37,48 +37,18 @@ class _MainScreenState extends State<MainScreen> {
     var headers = await getHeaders();
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
-      // _getDate();
-
     } else {
       final shared = await SharedPreferences.getInstance();
       shared.remove('auth_token');
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
-  }
-
-  Future<List<FinanceAccount>> _getDate() async {
-    final url = Uri(scheme: schema, host: host, path: '$path/financeAccounts');
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      http.Response response = await http.get(url);
-      if (response.statusCode == 200) {
-        List<dynamic> data = jsonDecode(response.body);
-        List<FinanceAccount> financeAccounts =
-            data.map((fjson) => FinanceAccount.fromJson(fjson)).toList();
-
-        widget.bankAccount = financeAccounts.firstWhere((a) => a.id == 1);
-        widget.cashAccount = financeAccounts.firstWhere((a) => a.id == 1);
-
-        return financeAccounts;
-      }
-    } catch (e) {
-      print(e.toString());
-      rethrow;
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-    return [];
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Directionality( // Use Directionality for RTL support
+    return Directionality(
+      // Use Directionality for RTL support
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
@@ -94,7 +64,6 @@ class _MainScreenState extends State<MainScreen> {
         ),
         body: RefreshIndicator(
           onRefresh: () async {
-            await _getDate();
             setState(() {
               _isLoading = false;
             });
@@ -104,7 +73,6 @@ class _MainScreenState extends State<MainScreen> {
           },
           child: ListView(
             children: [
-              //  _isLoading ? Center(child: CircularProgressIndicator(),) : AmountSummary(bankAccount: widget.bankAccount, cashAccount: widget.cashAccount),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: GridView.count(
@@ -114,10 +82,12 @@ class _MainScreenState extends State<MainScreen> {
                   crossAxisSpacing: 16.0,
                   mainAxisSpacing: 16.0,
                   children: [
-                    _buildGridItem(context, 'الأطباء', Icons.medical_services, () {
+                    _buildGridItem(context, 'الأطباء', Icons.medical_services,
+                        () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => DoctorListScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => DoctorListScreen()),
                       );
                     }),
                     _buildGridItem(context, 'الإعدادات', Icons.settings, () {
@@ -131,21 +101,44 @@ class _MainScreenState extends State<MainScreen> {
                     _buildGridItem(context, 'المالية', Icons.attach_money, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => FinanceScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => FinanceScreen()),
                       );
                     }),
-                    _buildGridItem(context, 'اداره المبيعات', Icons.local_pharmacy, () {
+                    _buildGridItem(
+                        context, 'اداره المبيعات', Icons.local_pharmacy, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => PharmacyScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => PharmacyScreen()),
                       );
                     }),
-                     _buildGridItem(context, 'جدول الاطباء', Icons.local_pharmacy, () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => DoctorScheduleManagerScreen()),
-                      );
-                    }),
+                    _buildGridItem(
+                      context,
+                      'جدول الاطباء',
+                      Icons.local_pharmacy,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DoctorScheduleManagerScreen()),
+                        );
+                      },
+                    ),
+                       _buildGridItem(
+                      context,
+                      'الايرادات ',
+                      Icons.local_pharmacy,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  RevenueScreen()),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),

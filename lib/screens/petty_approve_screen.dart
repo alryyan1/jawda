@@ -4,14 +4,17 @@ import 'package:jawda/models/petty_cash.dart';
 import 'package:jawda/services/dio_client.dart';
 
 class PettyApproveScreen extends StatefulWidget {
-  final Expense expense;
-  const PettyApproveScreen({Key? key, required this.expense}) : super(key: key);
+   Expense? expense;
+   String? id;
+   void Function(Expense expense)? onUpdate;
+   PettyApproveScreen({Key? key, required this.expense,required this.onUpdate,this.id}) : super(key: key);
 
   @override
   _PettyApproveScreenState createState() => _PettyApproveScreenState();
 }
 
 class _PettyApproveScreenState extends State<PettyApproveScreen> {
+  bool _loading = false;
   bool _loadingManager = false;
   bool _loadingAuditor = false;
   DateTime? _managerApprovalTime;
@@ -20,13 +23,50 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
   @override
   void initState() {
     super.initState();
-    _managerApprovalTime = widget.expense.managerApprovalTime;
-    _auditorApprovalTime = widget.expense.auditorApprovalTime;
+    _managerApprovalTime = widget.expense?.managerApprovalTime;
+    _auditorApprovalTime = widget.expense?.auditorApprovalTime;
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (widget.id !=null) {
+      _fetchExpense(widget.id);
+    }
+  });
+
+  }
+
+  Future<void> _fetchExpense(String? id) async {
+    setState(() {
+     _loading = true;
+    });
+
+    try {
+      final dio = DioClient.getDioInstance(context);
+
+      final response = await dio.get('petty-cash-permissions/$id');
+
+      if (response.statusCode == 200) {
+        setState(() {
+         widget.expense = Expense.fromJson(response.data);
+        });
+
+        final newExpense =  Expense.fromJson(response.data['data']);
+          if(widget.onUpdate !=null) {
+            widget.onUpdate!(newExpense);
+          } 
+
+      
+      } 
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+    } finally {
+      setState(() {
+        _loading = false;
+      });
+    }
   }
 
   Future<void> _approveExpense(String colName) async {
     setState(() {
-      if (colName == 'user_approve_time') {
+      if (colName == 'user_approved_time') {
         _loadingManager = true;
       } else {
         _loadingAuditor = true;
@@ -36,16 +76,21 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
     try {
       final dio = DioClient.getDioInstance(context);
 
-      final response = await dio.get('expense-approve/${widget.expense.id}?colName=$colName');
+      final response = await dio.get('expense-approve/${widget.expense?.id}?colName=$colName');
 
       if (response.statusCode == 200) {
         setState(() {
-          if (colName == 'user_approve_time') {
+          if (colName == 'user_approved_time') {
             _managerApprovalTime = DateTime.now();
           } else {
             _auditorApprovalTime = DateTime.now();
           }
         });
+
+        final newExpense =  Expense.fromJson(response.data['data']);
+          if(widget.onUpdate !=null) {
+            widget.onUpdate!(newExpense);
+          } 
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response.data['message'])),
@@ -57,7 +102,7 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
     } finally {
       setState(() {
-        if (colName == 'user_approve_time') {
+        if (colName == 'user_approved_time') {
           _loadingManager = false;
         } else {
           _loadingAuditor = false;
@@ -70,7 +115,7 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Directionality( // Use Directionality for RTL support
+    return _loading  ? Center(child: CircularProgressIndicator(),) : Directionality( // Use Directionality for RTL support
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
@@ -99,10 +144,10 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
                           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colorScheme.onSurface),
                         ),
                         SizedBox(height: 8),
-                        Text('المبلغ: ${intl.NumberFormat('#,###.##', 'ar_SA').format(double.parse(widget.expense.amount))}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                        Text('المستفيد: ${widget.expense.beneficiary}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                        Text('التاريخ: ${intl.DateFormat('yyyy-MM-dd').format(widget.expense.date)}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
-                        Text('البيان: ${widget.expense.description}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                        Text('المبلغ: ${intl.NumberFormat('#,###.##', 'ar_SA').format(double.parse(widget.expense?.amount ?? " 0.0"))}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                        Text('المستفيد: ${widget.expense?.beneficiary}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                        Text('التاريخ: ${intl.DateFormat('yyyy-MM-dd').format(widget.expense?.date ?? DateTime(2025))}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
+                        Text('البيان: ${widget.expense?.description}', style: TextStyle(color: colorScheme.onSurfaceVariant)),
                       ],
                     ),
                   ),
@@ -125,7 +170,7 @@ class _PettyApproveScreenState extends State<PettyApproveScreen> {
                         ),
                       ElevatedButton(
                         onPressed: _loadingManager || _managerApprovalTime != null ? null : () async {
-                          await _approveExpense('user_approve_time');
+                          await _approveExpense('user_approved_time');
                         },
                         child: _loadingManager ? CircularProgressIndicator() : Text('اعتماد'),
                         style: ElevatedButton.styleFrom(

@@ -48,7 +48,7 @@ class Expense {
       userId: json['user_id'] as int,
       signatureFileName: json['signature_file_name'] as String,
       entry: FinanceEntry.fromJson(json['entry'] as Map<String, dynamic>),
-      managerApprovalTime: json['manager_approved_time'] != null? DateTime.parse(json['manager_approved_time'] as String) : null,
+      managerApprovalTime: json['user_approved_time'] != null? DateTime.parse(json['user_approved_time'] as String) : null,
       auditorApprovalTime: json['auditor_approved_time'] != null? DateTime.parse(json['auditor_approved_time'] as String) : null,
     );
   }

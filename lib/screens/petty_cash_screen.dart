@@ -110,7 +110,7 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
     } catch (e) {
       _errorMessage = 'Failed to fetch deposits: $e';
       print(_errorMessage);
-      rethrow;
+      throw Exception(e.toString());
     } finally {
       _loading = false;
       //  notifyListeners();
@@ -170,24 +170,26 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
     }
   }
 
+  onExpenseUpdated(Expense newExpense) {
+    setState(() {
+      _expenses = _expenses.map((e) {
+        if (e.id == newExpense.id) {
+          return newExpense;
+        } else {
+          return e;
+        }
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              // Refresh the data
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => AddDepositScreen(),
-              ));
-            },
-          )
-        ],
-        title: Text('expenses'),
+        actions: [],
+        title: Text('اذونات الصرف'),
       ),
       body: loadingIntial
           ? Center(child: CircularProgressIndicator())
@@ -201,10 +203,15 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                   itemBuilder: (context, index) {
                     final expense = _expenses[index];
                     return InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                          return PettyApproveScreen(expense: expense,);
-                        },));
+                      onTap: () async {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) {
+                            return PettyApproveScreen(
+                              expense: expense,
+                              onUpdate: onExpenseUpdated,
+                            );
+                          },
+                        ));
                       },
                       child: Card(
                         elevation: 4,
@@ -213,31 +220,28 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                         ),
                         color: colorScheme.surface,
                         child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: colorScheme.primaryContainer,
-                            foregroundColor: colorScheme.onPrimaryContainer,
-                            child: IconButton(
-                                onPressed: () async {
-                                  final dio = DioClient.getDioInstance(context);
-                                  final response = await dio
-                                      .get('pettycash2/${expense.id}', queryParameters: {
-                                    'base64': '1',
-                                    'id': expense.id.toString()
-                                  });
-                                  if (response.statusCode == 200) {
-                                    final pdfRaw = response.data;
-                                    final cleanedRaw = cleanBase64(pdfRaw);
-                                    final pdfUnit8 = base64Decode(cleanedRaw);
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => MyPdfViewer(
-                                          pdfData: pdfUnit8,
-                                          id: expense.id.toString()),
-                                    ));
-                                  }
-                                },
-                                icon: Icon(
-                                    Icons.picture_as_pdf)), // Use a relevant icon
-                          ),
+                          isThreeLine: true,
+                          leading: IconButton(
+                              onPressed: () async {
+                                final dio = DioClient.getDioInstance(context);
+                                final response = await dio.get(
+                                    'pettycash2/${expense.id}',
+                                    queryParameters: {
+                                      'base64': '1',
+                                      'id': expense.id.toString()
+                                    });
+                                if (response.statusCode == 200) {
+                                  final pdfRaw = response.data;
+                                  final cleanedRaw = cleanBase64(pdfRaw);
+                                  final pdfUnit8 = base64Decode(cleanedRaw);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => MyPdfViewer(
+                                        pdfData: pdfUnit8,
+                                        id: expense.id.toString()),
+                                  ));
+                                }
+                              },
+                              icon: Icon(Icons.picture_as_pdf)),
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -247,17 +251,68 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
                                     fontWeight: FontWeight.bold,
                                     color: colorScheme.onSurface),
                               ),
-                              Text(
-                                ' (${expense.description}) ',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: colorScheme.onSurface),
+                              Container(
+                                height: 100,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        ' (${expense.description}) ',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: colorScheme.onSurface),
+                                      ),
+                                      Divider(),
+                                      Row(
+                                        spacing: 4,
+                                        children: [
+                                          expense.managerApprovalTime != null
+                                              ? Badge(
+                                                padding: EdgeInsets.all(5),
+                                                backgroundColor: Colors.green,
+                                                  label: Text('اكرم عبد الوهاب'),
+                                                )
+                                              : SizedBox(),
+                                                expense.auditorApprovalTime != null
+                                              ? Badge(
+                                                padding: EdgeInsets.all(5),
+                                                  label: Text('محمد بشير'),
+                                                )
+                                              : SizedBox()
+                                        ],
+                                      ),
+                                      expense.pdfFile == null ? SizedBox() : IconButton(
+                              onPressed: () async {
+                                final dio = DioClient.getDioInstance(context);
+                                final response = await dio.get(
+                                    'get-base64-petty/${expense.id}',
+                                    queryParameters: {
+                                      'base64': '1',
+                                      'id': expense.id.toString()
+                                    });
+                                if (response.statusCode == 200) {
+                                  final pdfRaw = response.data;
+                                  final cleanedRaw = cleanBase64(pdfRaw);
+                                  final pdfUnit8 = base64Decode(cleanedRaw);
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => MyPdfViewer(
+                                        pdfData: pdfUnit8,
+                                        id: expense.id.toString()),
+                                  ));
+                                }
+                              },
+                              icon: Icon(Icons.remove_red_eye)),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           subtitle: Text(
                             'Amount: ${NumberFormat('#,###.##', 'en_US').format(double.parse(expense.amount))}',
-                            style: TextStyle(color: colorScheme.onSurfaceVariant),
+                            style:
+                                TextStyle(color: colorScheme.onSurfaceVariant),
                           ),
                           trailing: IconButton(
                             icon: Icon(Icons.border_color_rounded),
