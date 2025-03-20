@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:jawda/constansts.dart';
-import '../models/doctor.dart';
+import 'package:jawda/models/doctor.dart';
+import 'package:jawda/models/patient_models.dart';
+import 'package:jawda/services/dio_client.dart';
 
 class DoctorProvider with ChangeNotifier {
   List<Doctor> _allDoctors = []; // Store all doctors fetched from API
@@ -13,7 +16,36 @@ class DoctorProvider with ChangeNotifier {
 
   List<Doctor> get doctors => _doctors;
   bool get isLoading => _isLoading;
+List<Specialist> _specialists = [];
+  List<Specialist> get specialists => _specialists;
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
 
+  Future<List<Specialist>> fetchSpecialists(BuildContext context,String filter) async {
+    _isLoading = true;
+    _errorMessage = null;
+    // notifyListeners();
+
+    try {
+      final dio = DioClient.getDioInstance(context);
+      final response = await dio.get('/specialists/all?name=${filter}'); // Replace with your API endpoint
+
+      if (response.statusCode == 200) {
+        final List<dynamic> decodedData = response.data;
+        _specialists = decodedData.map((item) => Specialist.fromJson(item as Map<String, dynamic>)).toList();
+        return _specialists;
+      } else {
+        _errorMessage = 'Failed to load specialists: ${response.statusCode}';
+      }
+    } catch (e) {
+      _errorMessage = 'Error fetching specialists: $e';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+   
+    }
+       return [];
+  }
   Future<List<Doctor>> fetchDoctors() async {
     _isLoading = true;
     if(SchedulerBinding.instance.schedulerPhase == SchedulerPhase.idle){
@@ -68,16 +100,14 @@ class DoctorProvider with ChangeNotifier {
   }
 
   Future<void> addDoctor(Doctor newDoctor) async {
-    final url = Uri.parse('http://192.168.100.70/laravel-react-app/public/api/doctors');  // Replace with your API endpoint
-
+    final url = Uri.parse('$schema://$host/${path}/doctors/add');  // Replace with your API endpoint
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: json.encode(newDoctor.toJson()),
       );
-
-      if (response.statusCode == 201) { // Assuming 201 Created on success
+      if (response.statusCode == 200) { // Assuming 201 Created on success
         fetchDoctors(); // Refresh the list
         notifyListeners();
       } else {
@@ -91,7 +121,7 @@ class DoctorProvider with ChangeNotifier {
   }
 
   Future<void> updateDoctor(Doctor updatedDoctor) async {
-    final url = Uri.parse('http://192.168.100.70/laravel-react-app/public/api/doctorsMobile/${updatedDoctor.id}'); // Replace with your API endpoint
+    final url = Uri.parse('$schema://$host/${path}/doctorsMobile/${updatedDoctor.id}'); // Replace with your API endpoint
 
     try {
       final response = await http.patch(

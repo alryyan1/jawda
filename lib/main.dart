@@ -7,11 +7,13 @@ import 'package:jawda/models/petty_cash.dart';
 import 'package:jawda/providers/client_provider.dart';
 import 'package:jawda/providers/deposit_provider.dart';
 import 'package:jawda/providers/item_provider.dart';
+import 'package:jawda/providers/lab_provider.dart';
 import 'package:jawda/providers/shift_provider.dart';
 import 'package:jawda/providers/supplier_provider.dart';
 import 'package:jawda/screens/petty_approve_screen.dart';
 import 'package:jawda/services/sockets.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'providers/doctor_provider.dart';
 import 'screens/login_screen.dart'; // Import LoginScreen
@@ -22,14 +24,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final GlobalKey<NavigatorState> nav = GlobalKey<NavigatorState>();
+final scaffoledMessangerState = GlobalKey<ScaffoldMessengerState>();
 
 @pragma('vm:entry-point')
 Future<void> onBackgroundMessage(RemoteMessage? message) async{
   if(message == null) return;
   print(message.data);
   nav.currentState!.pushNamed('expenseApprove',arguments: message.data['id']);
-  print("Background Message: ${message?.notification?.body}");
-  print("Background Message: ${message?.notification?.title}");
+  print("Background Message: ${message.notification?.body}");
+  print("Background Message: ${message.notification?.title}");
 }
 Future<void> saveTokenToFirestore(String? token,int userId) async {
   if (token == null) return;
@@ -57,6 +60,9 @@ void main() async {
     // print(token);
     FirebaseMessaging.onBackgroundMessage(onBackgroundMessage);
     FirebaseMessaging.instance.getInitialMessage().then(onBackgroundMessage);
+     // Listen for foreground messages
+
+
     FirebaseMessaging.onMessageOpenedApp.listen(onBackgroundMessage);
     // saveTokenToFirestore(token);
 
@@ -64,7 +70,7 @@ void main() async {
         // print('token');
     },);
 
-  await FirebaseMessaging.instance.subscribeToTopic('news');
+  await FirebaseMessaging.instance.subscribeToTopic('tests');
  // Dart client
 
   SocketService();
@@ -74,6 +80,7 @@ void main() async {
         ChangeNotifierProvider(create:  (context) {
           return ClientProvider();
         },),
+        ChangeNotifierProvider(create: (context)=> LabProvider()),
         ChangeNotifierProvider(create: (context)=> SupplierProvider()),
         ChangeNotifierProvider(create: (context)=> DepositProvider()),
         ChangeNotifierProvider(create: (context)=> ItemProvider()),
@@ -85,10 +92,41 @@ void main() async {
          
        ],
        
-      child: MaterialApp(
-        navigatorKey: nav,  // Use the global key for navigation
+      child:MyApp()
+    ),
+  );
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+  
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+       // Listen for foreground messages
+   // Ensure it runs after the first frame
+
+  }
+ 
+
+  @override
+  Widget build(BuildContext context) {
+   return ToastificationWrapper(child: MaterialApp(
+        navigatorKey: nav,
+        scaffoldMessengerKey: scaffoledMessangerState,  // Use the global key for navigation
         title: 'Doctors App', 
         onGenerateRoute: (settings) {
+          if(settings.name == 'login'){
+            return MaterialPageRoute(builder: (context) {
+              return LoginScreen();
+            },);
+          }
           if(settings.name == 'expenseApprove'){
             return MaterialPageRoute(builder: (context) {
               final expenseId = settings.arguments ;
@@ -103,8 +141,65 @@ void main() async {
           ),
           primarySwatch: Colors.blue,
         ),
-        home: authToken != null ? MainScreen() : LoginScreen(), // Check for token
-      ),
-    ),
-  );
+        home: Home(), // Check for token
+      ),);
+    
+  }
+}
+
+void handleFirebaseMessage(BuildContext context , RemoteMessage message){
+      
+    
+   Toastification().show(
+    context: context,
+    title: Text(message.notification?.title ?? 'عنوان'),
+   description:Text(message.notification?.body ?? 'اشعار جديد'),
+    autoCloseDuration: Duration(seconds: 5),
+    callbacks: ToastificationCallbacks(
+      onTap: (value) => nav.currentState!.pushNamed('expenseApprove',arguments: message.data['id']),
+    )
+   );
+  //  ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(message.notification?.body ?? "New Notification"),
+  //       duration: Duration(seconds: 5),
+  //     ),
+  //   );
+
+}
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String? authToken;
+
+    Future<void> loadAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      authToken = prefs.getString('auth_token'); // Retrieve token
+      if(mounted){
+           FirebaseMessaging.onMessage.listen((message) {
+          handleFirebaseMessage(context, message);
+      },);
+      }
+   
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    loadAuthToken();
+    
+
+  }
+  @override
+  Widget build(BuildContext context) {
+
+    return authToken != null ? MainScreen() : LoginScreen();
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:jawda/main.dart';
 
 class ErrorInterceptor extends Interceptor {
   final BuildContext context;
@@ -18,7 +19,11 @@ class ErrorInterceptor extends Interceptor {
         duration: Duration(seconds: 13),
       ),
     );
+    if(err.response!.statusCode == 411){
+      nav.currentState!.pushNamed('login');
 
+    }
+    // Logout if token expired
     return handler.next(err); // Continue handling the error
   }
 

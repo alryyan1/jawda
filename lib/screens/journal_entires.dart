@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:jawda/constansts.dart';
 import 'package:jawda/models/finance_account.dart';
+import 'package:jawda/services/dio_client.dart';
 
 class JournalEntriesScreen extends StatefulWidget {
   @override
@@ -26,16 +27,16 @@ class _JournalEntriesScreenState extends State<JournalEntriesScreen> {
       _isLoading = true;
     });
 
-    final url = Uri(
-        scheme: schema,
-        host: host,
-        path: path + '/financeEntries'); // Replace with your API endpoint
 
     try {
-      final response = await http.get(url);
-
+          final now = DateTime.now();
+    final firstDay = DateTime(now.year,now.month,1);
+    final lastDay = DateTime(now.year,now.month+1,0);
+  
+      final dio = DioClient.getDioInstance(context);
+      final response = await dio.get('financeEntries', queryParameters:  {'first':DateFormat('yyyy-MM-dd').format(firstDay),'second':DateFormat('yyyy-MM-dd').format(lastDay)});
       if (response.statusCode == 200) {
-        final List<dynamic> decodedData = json.decode(response.body);
+        final List<dynamic> decodedData = response.data;
         _entries = decodedData.map((item) => FinanceEntry.fromJson(item)).toList();
       } else {
         print('Failed to load journal entries: ${response.statusCode}');

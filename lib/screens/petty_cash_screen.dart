@@ -11,6 +11,7 @@ import 'package:jawda/models/pharmacy_models.dart';
 import 'package:jawda/providers/deposit_provider.dart';
 import 'package:jawda/screens/pdf_veiwer.dart';
 import 'package:jawda/screens/petty_approve_screen.dart';
+import 'package:jawda/screens/petty_cash_create_screen.dart';
 import 'package:jawda/screens/pharmacy/add_deposit_screen.dart';
 import 'package:jawda/screens/pharmacy/deposit_items_screen.dart';
 import 'package:jawda/screens/signature_screen.dart';
@@ -188,7 +189,20 @@ class _PettyCashScreenState extends State<PettyCashScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        actions: [],
+        actions: [
+          IconButton(
+                onPressed: () async {
+                  await Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return AddPettyCashScreen(
+                      
+                      );
+                    },
+                  ));
+                },
+                icon: Icon(Icons.add),
+              ),
+        ],
         title: Text('اذونات الصرف'),
       ),
       body: loadingIntial

@@ -76,12 +76,14 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
       _isPdfLoading = true;
       _pdfData = null; // Reset previous PDF data
     });
-
+    final now = DateTime.now();
+    final firstDay = DateTime(now.year,now.month,1);
+    final lastDay = DateTime(now.year,now.month+1,0);
     final url = Uri(
         scheme: schema,
         host: host,
         path: path + '/ledger/${accountId}',
-        queryParameters: {'base64': '1'});
+        queryParameters: {'base64': '1','first':DateFormat('yyyy-MM-dd').format(firstDay),'second':DateFormat('yyyy-MM-dd').format(lastDay)});
 
     try {
       final response = await http.get(url);
@@ -152,15 +154,15 @@ class _FinanceAccountListScreenState extends State<FinanceAccountListScreen> {
                                 },));
                               },
                             ),
-                            trailing: IconButton(
-                                onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) {
-                                      return Ledger(financeAccount: account);
-                                    },
-                                  ));
-                                },
-                                icon:  Icon(Icons.remove_red_eye)),
+                            // trailing: IconButton(
+                            //     onPressed: () {
+                            //       Navigator.push(context, MaterialPageRoute(
+                            //         builder: (context) {
+                            //           return Ledger(financeAccount: account);
+                            //         },
+                            //       ));
+                            //     },
+                            //     icon:  Icon(Icons.remove_red_eye)),
                           );
                         },
                       ),

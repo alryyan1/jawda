@@ -12,16 +12,16 @@ import '../models/finance_account.dart';
 import 'package:path_provider/path_provider.dart'; // Import path_provider
 import 'package:pdfrx/pdfrx.dart'; // Import pdfrx
 
-const schema = 'https';
-const host = 'alroomy.a.pinggy.link';
+const schema = 'http';
+// const host = 'alroomy.a.pinggy.link';
 // const socketHost = 'altohami.a.pinggy.link';
 // const socketHost = 'rnnvc-196-202-136-105.a.free.pinggy.link';
 // const host = 'altohami.a.pinggy.link';
-// const host = '192.168.100.70';
+const host = '192.168.100.70';
 // const host = '192.168.137.1';
 // const path = 'mirgani/public/api';
-// const path = 'laravel-react-app/public/api';
-const path = 'alroomy/public/api';
+const path = 'laravel-react-app/public/api';
+// const path = 'alroomy/public/api';
 
 getHeaders() async {
   final instance = await SharedPreferences.getInstance();
@@ -31,7 +31,17 @@ getHeaders() async {
     'Content-Type': 'application/json',
   };
 }
-
+  void sendNotification(String id, String message, String title) async {
+    final headers = await getHeaders();
+    try {
+      final url = Uri(host: host, scheme: schema, port: 8000, path: 'msg');
+      http.post(url,
+          body: jsonEncode({"id": id, "title": title, "description": message}),
+          headers: headers);
+    } catch (e) {
+      throw Exception('cannot create notification ${e.toString()}');
+    }
+  }
 String cleanBase64(String base64String) {
   // Remove everything before the actual base64 data
   RegExp exp = RegExp(r'base64,(.*)');

@@ -9,10 +9,10 @@ class Expense {
   final dynamic pdfFile;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final int financeEntryId;
+  final int? financeEntryId;
   final int userId;
-  final String signatureFileName;
-  final FinanceEntry entry;
+  final String? signatureFileName;
+  final FinanceEntry? entry;
   final DateTime? managerApprovalTime;
   final DateTime? auditorApprovalTime;
 
@@ -44,10 +44,10 @@ class Expense {
       pdfFile: json['pdf_file'],
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
-      financeEntryId: json['finance_entry_id'] as int,
+      financeEntryId: json['finance_entry_id'] != null ?  json['finance_entry_id'] as int : null,
       userId: json['user_id'] as int,
-      signatureFileName: json['signature_file_name'] as String,
-      entry: FinanceEntry.fromJson(json['entry'] as Map<String, dynamic>),
+      signatureFileName: json['signature_file_name'] as String?,
+      entry: json['entry'] != null ?  FinanceEntry.fromJson(json['entry'] as Map<String, dynamic>) : null,
       managerApprovalTime: json['user_approved_time'] != null? DateTime.parse(json['user_approved_time'] as String) : null,
       auditorApprovalTime: json['auditor_approved_time'] != null? DateTime.parse(json['auditor_approved_time'] as String) : null,
     );

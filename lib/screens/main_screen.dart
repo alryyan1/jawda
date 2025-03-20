@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:jawda/screens/account_summary.dart';
 import 'package:jawda/screens/doctor_schedule.dart';
 import 'package:jawda/screens/finance_screen.dart';
+import 'package:jawda/screens/lab/lab_tests_screen.dart';
 import 'package:jawda/screens/pharmacy/pharamcy_screen.dart';
 import 'package:jawda/screens/revenue_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +34,8 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   _checkSession() async {
-    final url = Uri(host: host, scheme: schema, path: path + '/user/');
+    try {
+  final url = Uri(host: host, scheme: schema, path: path + '/user/');
     var headers = await getHeaders();
     var response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
@@ -43,6 +45,12 @@ class _MainScreenState extends State<MainScreen> {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => LoginScreen()));
     }
+    }
+    catch (error) {
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString())));
+      print('Error checking session: $error');
+    }
+  
   }
 
   @override
@@ -94,10 +102,13 @@ class _MainScreenState extends State<MainScreen> {
                     //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     //       content: Text('صفحة الإعدادات قيد الإنشاء')));
                     // }),
-                    // _buildGridItem(context, 'المختبر', Icons.science, () {
-                    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    //       content: Text('صفحة المختبر قيد الإنشاء')));
-                    // }),
+                    _buildGridItem(context, 'التحاليل', Icons.science, () {
+                       Navigator.push(
+                        context,  
+                        MaterialPageRoute(
+                            builder: (context) => LabTestsScreen()),
+                      );
+                    }),
                     _buildGridItem(context, 'المالية', Icons.attach_money, () {
                       Navigator.push(
                         context,

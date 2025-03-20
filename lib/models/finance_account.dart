@@ -18,7 +18,7 @@ class FinanceAccount {
   final double totalBalance;
   final List<Credit> credits;
   final List<Debit> debits; // Use dynamic if the structure isn't known
-  final List<FinanceAccount> children;
+  final List<FinanceAccount> children; 
   final AccountType? accountType;
 
   FinanceAccount({
@@ -55,7 +55,7 @@ class FinanceAccount {
       credits: (json['credits'] as List<dynamic>).map((item) => Credit.fromJson(item)).toList(),
       debits: (json['debits'] as List<dynamic>).map((e) => Debit.fromJson(e)).toList(),
       children: (json['children'] as List<dynamic>).map((item) => FinanceAccount.fromJson(item)).toList(),
-      accountType: json['type'] != null ?  AccountType.values.firstWhere((element) => element.toString().split('.').last == json['type'],) : null,
+      accountType: json['type'] != null ?  AccountType.values.firstWhere((element) => element.toString().split('.').last == json['type'],orElse:() => AccountType.revenue,) : null,
     );
   }
 }

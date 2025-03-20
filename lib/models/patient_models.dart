@@ -1,3 +1,4 @@
+import 'package:jawda/models/doctor.dart';
 import 'package:jawda/models/user.dart';
 
 
@@ -687,7 +688,6 @@ class MainTest {
   final num price;
   final int firstChildId;
   final Container container;
-  final ChildTest oneChild;
 
   MainTest({
     required this.id,
@@ -698,7 +698,6 @@ class MainTest {
     required this.price,
     required this.firstChildId,
     required this.container,
-    required this.oneChild,
   });
            factory MainTest.fromJson(Map<String, dynamic> json) {
     return MainTest(
@@ -707,10 +706,9 @@ class MainTest {
     packId: json['pack_id'] as int,
     pageBreak: json['pageBreak'] as int,
     containerId: json['container_id'] as int,
-    price: json['price'] as num,
+    price: json['price'] == null ? 0 : json['price'] as num,
     firstChildId: json['firstChildId'] as int,
     container: Container.fromJson(json['container'] as Map<String, dynamic>),
-    oneChild: ChildTest.fromJson(json['one_child'] as Map<String, dynamic>),
     );
   }
 }
@@ -1253,58 +1251,6 @@ class DoctorShift {
         doctor: Doctor.fromJson(json['doctor'] as Map<String, dynamic>),
         cost: json['cost'],
         visits: (json['visits'] as List?)?.map((e) => DoctorVisit.fromJson(e as Map<String, dynamic>)).toList(),
-    );
-  }
-}
-
-class Doctor {
-  int id;
-  String name;
-  String phone;
-  num cash_percentage;
-  num company_percentage;
-  num static_wage;
-  num lab_percentage;
-  int specialist_id;
-  String created_at;
-  String updated_at;
-  LastShift lastShift;
-  List<DoctorService> services;
-  Specialist specialist;
-  List<dynamic> doctor_sub_service_costs;
-
-  Doctor({
-    required this.id,
-    required this.name,
-    required this.phone,
-    required this.cash_percentage,
-    required this.company_percentage,
-    required this.static_wage,
-    required this.lab_percentage,
-    required this.specialist_id,
-    required this.created_at,
-    required this.updated_at,
-    required this.lastShift,
-    required this.services,
-    required this.specialist,
-    required this.doctor_sub_service_costs,
-  });
-      factory Doctor.fromJson(Map<String, dynamic> json) {
-    return Doctor(
-    id: json['id'] as int,
-    name: json['name'] as String,
-    phone: json['phone'] as String,
-    cash_percentage: json['cash_percentage'] as num,
-    company_percentage: json['company_percentage'] as num,
-    static_wage: json['static_wage'] as num,
-    lab_percentage: json['lab_percentage'] as num,
-    specialist_id: json['specialist_id'] as int,
-    created_at: json['created_at'] as String,
-    updated_at: json['updated_at'] as String,
-    lastShift: LastShift.fromJson(json['lastShift'] as Map<String, dynamic>),
-    services: (json['services'] as List).map((e) => DoctorService.fromJson(e as Map<String, dynamic>)).toList(),
-    specialist: Specialist.fromJson(json['specialist'] as Map<String, dynamic>),
-    doctor_sub_service_costs: json['doctor_sub_service_costs'] as List<dynamic>,
     );
   }
 }
